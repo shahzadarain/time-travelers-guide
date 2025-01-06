@@ -12,9 +12,17 @@ interface TimeZoneCardProps {
   isSource?: boolean;
   onTimeZoneChange?: (timezone: string) => void;
   onTimeChange?: (time: string) => void;
+  sourceTime?: string;
+  sourceTimezone?: string;
 }
 
-export const TimeZoneCard = ({ isSource = false, onTimeZoneChange, onTimeChange }: TimeZoneCardProps) => {
+export const TimeZoneCard = ({ 
+  isSource = false, 
+  onTimeZoneChange, 
+  onTimeChange,
+  sourceTime,
+  sourceTimezone 
+}: TimeZoneCardProps) => {
   const [selectedTimezone, setSelectedTimezone] = useState("UTC");
   const [currentTime, setCurrentTime] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState(
@@ -43,6 +51,23 @@ export const TimeZoneCard = ({ isSource = false, onTimeZoneChange, onTimeChange 
   const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedTime(e.target.value);
     onTimeChange?.(e.target.value);
+  };
+
+  const getConvertedTime = () => {
+    if (!isSource && sourceTime && sourceTimezone) {
+      const [hours, minutes] = sourceTime.split(':');
+      const date = new Date();
+      date.setHours(parseInt(hours));
+      date.setMinutes(parseInt(minutes));
+      
+      return date.toLocaleTimeString(undefined, {
+        timeZone: selectedTimezone,
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      });
+    }
+    return selectedTime;
   };
 
   const selectedZone = timeZones
@@ -115,21 +140,19 @@ export const TimeZoneCard = ({ isSource = false, onTimeZoneChange, onTimeChange 
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <Clock className="h-4 w-4 text-muted-foreground" />
-              <Input
-                type="time"
-                value={selectedTime}
-                onChange={handleTimeChange}
-                className="w-32"
-              />
+              {isSource ? (
+                <Input
+                  type="time"
+                  value={selectedTime}
+                  onChange={handleTimeChange}
+                  className="w-32"
+                />
+              ) : (
+                <span className="text-2xl font-bold">
+                  {getConvertedTime()}
+                </span>
+              )}
             </div>
-            <span className="text-2xl font-bold">
-              {currentTime.toLocaleTimeString(undefined, {
-                timeZone: selectedTimezone,
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
-              })}
-            </span>
           </div>
         </div>
       </CardContent>

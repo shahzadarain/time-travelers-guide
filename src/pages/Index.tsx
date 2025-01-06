@@ -5,6 +5,8 @@ import { useToast } from "@/components/ui/use-toast";
 
 const Index = () => {
   const [targetTimeZones, setTargetTimeZones] = useState([1]);
+  const [sourceTime, setSourceTime] = useState("");
+  const [sourceTimezone, setSourceTimezone] = useState("UTC");
   const { toast } = useToast();
 
   const handleAddTimeZone = () => {
@@ -19,12 +21,14 @@ const Index = () => {
     setTargetTimeZones([...targetTimeZones, targetTimeZones.length + 1]);
   };
 
-  const handleTimeZoneChange = (timezone: string) => {
-    console.log("Time zone changed:", timezone);
+  const handleSourceTimeZoneChange = (timezone: string) => {
+    console.log("Source time zone changed:", timezone);
+    setSourceTimezone(timezone);
   };
 
-  const handleTimeChange = (time: string) => {
-    console.log("Time changed:", time);
+  const handleSourceTimeChange = (time: string) => {
+    console.log("Source time changed:", time);
+    setSourceTime(time);
   };
 
   return (
@@ -40,17 +44,17 @@ const Index = () => {
         <div className="grid gap-6 mb-8">
           <TimeZoneCard 
             isSource 
-            onTimeZoneChange={handleTimeZoneChange}
-            onTimeChange={handleTimeChange}
+            onTimeZoneChange={handleSourceTimeZoneChange}
+            onTimeChange={handleSourceTimeChange}
           />
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {targetTimeZones.map((id) => (
             <TimeZoneCard 
-              key={id} 
-              onTimeZoneChange={handleTimeZoneChange}
-              onTimeChange={handleTimeChange}
+              key={id}
+              sourceTime={sourceTime}
+              sourceTimezone={sourceTimezone}
             />
           ))}
           {targetTimeZones.length < 4 && (
