@@ -1,31 +1,16 @@
+import { supabase } from "@/integrations/supabase/client";
+
 export const makePerplexityRequest = async (query: string, apiKey: string) => {
   console.log("Making Perplexity API request for query:", query);
   
   try {
-    const response = await fetch("https://api.perplexity.ai/chat/completions", {
+    const response = await fetch(`${supabase.supabaseUrl}/functions/v1/perplexity`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
-        Accept: "application/json",
+        "Authorization": `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({
-        model: "llama-3.1-sonar-small-128k-online",
-        messages: [
-          {
-            role: "system",
-            content: `You are a time conversion assistant. Extract time and location information from the query and respond with ONLY a JSON object in this EXACT format, with NO additional text or explanation:
-{"sourceLocation":"LOCATION","sourceTime":"HH:mm","targetLocation":"LOCATION"}
-Use only city or country names without extra words. For example: "Paris", "Tokyo", "United States", etc.
-For the time, always convert to 24-hour format.`
-          },
-          {
-            role: "user",
-            content: query,
-          },
-        ],
-        temperature: 0.1,
-      }),
+      body: JSON.stringify({ query }),
     });
 
     if (!response.ok) {
