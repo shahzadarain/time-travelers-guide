@@ -48,9 +48,19 @@ const Index = () => {
     shareText += `📅 Meeting Time: ${meetingTime} (${sourceTimezone})\n\n`;
     shareText += `Team Members' Local Times:\n`;
     
-    // Get all timezone cards
-    const cards = document.querySelectorAll('.time-zone-card');
-    cards.forEach((card) => {
+    // First, get the source time zone card
+    const sourceCard = document.querySelector('.time-zone-card');
+    if (sourceCard) {
+      const sourceLocation = sourceCard.querySelector('.location-text')?.textContent?.trim();
+      const sourceTime = sourceCard.querySelector('.time-text')?.textContent?.trim();
+      if (sourceLocation && sourceTime) {
+        shareText += `${sourceLocation}: ${sourceTime}\n`;
+      }
+    }
+
+    // Then get all non-source time zone cards
+    const teamCards = document.querySelectorAll('.time-zone-card:not(:first-child)');
+    teamCards.forEach((card) => {
       const locationElement = card.querySelector('.location-text');
       const timeElement = card.querySelector('.time-text');
       
@@ -58,7 +68,7 @@ const Index = () => {
         const location = locationElement.textContent?.trim();
         const time = timeElement.textContent?.trim();
         
-        console.log('Found card:', { location, time }); // Debug log
+        console.log('Found team card:', { location, time }); // Debug log
         
         if (location && time) {
           shareText += `${location}: ${time}\n`;
@@ -66,7 +76,7 @@ const Index = () => {
       }
     });
 
-    console.log('Share text:', shareText); // Debug log
+    console.log('Final share text:', shareText); // Debug log
 
     try {
       await navigator.clipboard.writeText(shareText);
@@ -75,7 +85,7 @@ const Index = () => {
         description: "Time zones summary has been copied to your clipboard.",
       });
     } catch (err) {
-      console.error('Failed to copy:', err); // Debug log
+      console.error('Failed to copy:', err);
       toast({
         title: "Failed to copy",
         description: "Please try again or copy manually.",
