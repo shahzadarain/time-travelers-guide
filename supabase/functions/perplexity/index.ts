@@ -42,14 +42,17 @@ serve(async (req) => {
 
     const { query } = await req.json();
 
+    console.log("Making request to Perplexity API with query:", query);
+
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${PERPLEXITY_API_KEY}`,
         'Content-Type': 'application/json',
+        'Accept': 'application/json'
       },
       body: JSON.stringify({
-        model: 'llama-3.1-sonar-small-128k-online',
+        model: 'mistral-7b-instruct',
         messages: [
           {
             role: 'system',
@@ -60,14 +63,24 @@ For the time, always convert to 24-hour format.`
           },
           {
             role: 'user',
-            content: query,
+            content: query
           }
         ],
-        temperature: 0.1,
       }),
     });
 
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Perplexity API Error:", {
+        status: response.status,
+        statusText: response.statusText,
+        body: errorText
+      });
+      throw new Error(`Perplexity API request failed: ${response.status} - ${errorText}`);
+    }
+
     const data = await response.json();
+    console.log("Perplexity API Response:", data);
 
     return new Response(JSON.stringify(data), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
