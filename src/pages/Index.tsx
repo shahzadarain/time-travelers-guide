@@ -23,6 +23,10 @@ const Index = () => {
     console.log("Time zone changed:", timezone);
   };
 
+  const handleTimeChange = (time: string) => {
+    console.log("Time changed:", time);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -34,12 +38,20 @@ const Index = () => {
         </div>
 
         <div className="grid gap-6 mb-8">
-          <TimeZoneCard isSource onTimeZoneChange={handleTimeZoneChange} />
+          <TimeZoneCard 
+            isSource 
+            onTimeZoneChange={handleTimeZoneChange}
+            onTimeChange={handleTimeChange}
+          />
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {targetTimeZones.map((id) => (
-            <TimeZoneCard key={id} onTimeZoneChange={handleTimeZoneChange} />
+            <TimeZoneCard 
+              key={id} 
+              onTimeZoneChange={handleTimeZoneChange}
+              onTimeChange={handleTimeChange}
+            />
           ))}
           {targetTimeZones.length < 4 && (
             <AddTimeZoneButton onClick={handleAddTimeZone} />

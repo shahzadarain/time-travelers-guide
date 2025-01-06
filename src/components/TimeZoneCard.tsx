@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Check, ChevronsUpDown, Clock, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
@@ -10,11 +11,19 @@ import { timeZones } from "@/data/timeZones";
 interface TimeZoneCardProps {
   isSource?: boolean;
   onTimeZoneChange?: (timezone: string) => void;
+  onTimeChange?: (time: string) => void;
 }
 
-export const TimeZoneCard = ({ isSource = false, onTimeZoneChange }: TimeZoneCardProps) => {
+export const TimeZoneCard = ({ isSource = false, onTimeZoneChange, onTimeChange }: TimeZoneCardProps) => {
   const [selectedTimezone, setSelectedTimezone] = useState("UTC");
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [selectedTime, setSelectedTime] = useState(
+    new Date().toLocaleTimeString(undefined, {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    })
+  );
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -29,6 +38,11 @@ export const TimeZoneCard = ({ isSource = false, onTimeZoneChange }: TimeZoneCar
     setSelectedTimezone(value);
     setOpen(false);
     onTimeZoneChange?.(value);
+  };
+
+  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedTime(e.target.value);
+    onTimeChange?.(e.target.value);
   };
 
   const selectedZone = timeZones
@@ -98,8 +112,16 @@ export const TimeZoneCard = ({ isSource = false, onTimeZoneChange }: TimeZoneCar
             </PopoverContent>
           </Popover>
           
-          <div className="flex items-center space-x-2">
-            <Clock className="h-4 w-4 text-muted-foreground" />
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <Clock className="h-4 w-4 text-muted-foreground" />
+              <Input
+                type="time"
+                value={selectedTime}
+                onChange={handleTimeChange}
+                className="w-32"
+              />
+            </div>
             <span className="text-2xl font-bold">
               {currentTime.toLocaleTimeString(undefined, {
                 timeZone: selectedTimezone,
