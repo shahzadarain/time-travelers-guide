@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,53 +13,49 @@ serve(async (req) => {
   }
 
   try {
-    const PERPLEXITY_API_KEY = Deno.env.get('PERPLEXITY_API_KEY');
-    if (!PERPLEXITY_API_KEY) {
-      throw new Error('PERPLEXITY_API_KEY is not set');
+    const OLLAMA_API_URL = Deno.env.get('OLLAMA_API_URL');
+    if (!OLLAMA_API_URL) {
+      throw new Error('OLLAMA_API_URL is not set');
     }
 
     const { query } = await req.json();
     console.log("Processing query:", query);
 
-    const response = await fetch('https://api.perplexity.ai/chat/completions', {
+    const response = await fetch(`${OLLAMA_API_URL}/api/generate`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${PERPLEXITY_API_KEY}`,
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
       },
       body: JSON.stringify({
-        model: 'llama-3.1-sonar-small-128k-online',
-        messages: [
-          {
-            role: 'system',
-            content: `You are a time conversion assistant. Extract time and location information from the query and respond with ONLY a JSON object in this EXACT format, with NO additional text or explanation:
-{"sourceLocation":"LOCATION","sourceTime":"HH:mm","targetLocation":"LOCATION"}
-Use only city or country names without extra words. For example: "Paris", "Tokyo", "United States", etc.
-For the time, always convert to 24-hour format.`
-          },
-          {
-            role: 'user',
-            content: query
-          }
-        ]
+        model: 'llama2',
+        prompt: `You are a time conversion assistant. Extract time and location information from this query and respond with ONLY a JSON object in this EXACT format, with NO additional text: {"sourceLocation":"LOCATION","sourceTime":"HH:mm","targetLocation":"LOCATION"}. Use only city or country names without extra words. Query: ${query}`,
+        stream: false,
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Perplexity API Error:", {
+      console.error("Ollama API Error:", {
         status: response.status,
         statusText: response.statusText,
         body: errorText
       });
-      throw new Error(`Perplexity API request failed: ${response.status} - ${errorText}`);
+      throw new Error(`Ollama API request failed: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
-    console.log("Perplexity API Response:", data);
+    console.log("Ollama API Response:", data);
 
-    return new Response(JSON.stringify(data), {
+    // Format the response to match the expected structure
+    const formattedResponse = {
+      choices: [{
+        message: {
+          content: data.response
+        }
+      }]
+    };
+
+    return new Response(JSON.stringify(formattedResponse), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
