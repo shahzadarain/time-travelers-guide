@@ -4,7 +4,7 @@ export const makePerplexityRequest = async (query: string, apiKey: string) => {
   console.log("Making Perplexity API request for query:", query);
   
   try {
-    const response = await fetch(`${supabase.supabaseUrl}/functions/v1/perplexity`, {
+    const response = await fetch("https://cvqssrfmkgnbnkoqqtsj.supabase.co/functions/v1/perplexity", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
