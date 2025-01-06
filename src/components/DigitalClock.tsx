@@ -1,12 +1,13 @@
 interface DigitalClockProps {
   timezone: string;
   currentTime: Date;
+  hour12?: boolean;
 }
 
-export const DigitalClock = ({ timezone, currentTime }: DigitalClockProps) => {
+export const DigitalClock = ({ timezone, currentTime, hour12 = false }: DigitalClockProps) => {
   const time = currentTime.toLocaleTimeString(undefined, {
     timeZone: timezone,
-    hour12: false,
+    hour12: hour12,
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit"

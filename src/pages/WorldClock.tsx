@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Globe, Plus, X } from "lucide-react";
+import { Globe, Plus } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { timeZones } from "@/data/timeZones";
 import { cn } from "@/lib/utils";
 import { DigitalClock } from "@/components/DigitalClock";
 import { useToast } from "@/components/ui/use-toast";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface TimeZoneCard {
   id: number;
@@ -15,10 +17,36 @@ interface TimeZoneCard {
 }
 
 export const WorldClock = () => {
-  const [timeZoneCards, setTimeZoneCards] = useState<TimeZoneCard[]>([{ id: 1, timezone: "UTC" }]);
+  const [timeZoneCards, setTimeZoneCards] = useState<TimeZoneCard[]>([]);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [openPopovers, setOpenPopovers] = useState<{ [key: number]: boolean }>({});
+  const [use24Hour, setUse24Hour] = useState(() => {
+    const saved = localStorage.getItem('timeFormat');
+    return saved ? saved === '24h' : true;
+  });
   const { toast } = useToast();
+
+  // Load saved timezones from localStorage
+  useEffect(() => {
+    const savedTimeZones = localStorage.getItem('timeZones');
+    if (savedTimeZones) {
+      setTimeZoneCards(JSON.parse(savedTimeZones));
+    } else {
+      setTimeZoneCards([{ id: 1, timezone: "UTC" }]);
+    }
+  }, []);
+
+  // Save timezones to localStorage whenever they change
+  useEffect(() => {
+    if (timeZoneCards.length > 0) {
+      localStorage.setItem('timeZones', JSON.stringify(timeZoneCards));
+    }
+  }, [timeZoneCards]);
+
+  // Save time format preference
+  useEffect(() => {
+    localStorage.setItem('timeFormat', use24Hour ? '24h' : '12h');
+  }, [use24Hour]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -63,13 +91,23 @@ export const WorldClock = () => {
       <div className="max-w-7xl mx-auto space-y-8">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <h1 className="text-4xl font-bold text-primary">World Clock</h1>
-          <Button 
-            onClick={handleAddTimeZone} 
-            className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            Add Time Zone
-          </Button>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="time-format"
+                checked={use24Hour}
+                onCheckedChange={setUse24Hour}
+              />
+              <Label htmlFor="time-format">24-hour format</Label>
+            </div>
+            <Button 
+              onClick={handleAddTimeZone} 
+              className="bg-primary hover:bg-primary/90 text-white gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Add Time Zone
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -154,7 +192,7 @@ export const WorldClock = () => {
                   </div>
 
                   <div className="flex justify-center items-center h-[120px] bg-gray-50 dark:bg-gray-900/50 rounded-lg">
-                    <DigitalClock timezone={card.timezone} currentTime={currentTime} />
+                    <DigitalClock timezone={card.timezone} currentTime={currentTime} hour12={!use24Hour} />
                   </div>
                 </div>
               </Card>
