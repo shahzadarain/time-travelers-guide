@@ -1,14 +1,38 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TimeZoneCard } from "@/components/TimeZoneCard";
 import { AddTimeZoneButton } from "@/components/AddTimeZoneButton";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Share2, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 const Index = () => {
   const { toast } = useToast();
   const [timeZoneCards, setTimeZoneCards] = useState([{ id: 1, timezone: "UTC" }]);
+  const [hour12Format, setHour12Format] = useState(() => {
+    const saved = localStorage.getItem("timeFormat");
+    return saved ? JSON.parse(saved) : true;
+  });
+
+  // Save time format preference
+  useEffect(() => {
+    localStorage.setItem("timeFormat", JSON.stringify(hour12Format));
+  }, [hour12Format]);
+
+  // Save timezone cards
+  useEffect(() => {
+    localStorage.setItem("timeZoneCards", JSON.stringify(timeZoneCards));
+  }, [timeZoneCards]);
+
+  // Load saved timezone cards on mount
+  useEffect(() => {
+    const savedCards = localStorage.getItem("timeZoneCards");
+    if (savedCards) {
+      setTimeZoneCards(JSON.parse(savedCards));
+    }
+  }, []);
 
   const handleAddTimeZone = () => {
     const newId = Math.max(...timeZoneCards.map(card => card.id), 0) + 1;
@@ -47,7 +71,19 @@ const Index = () => {
 
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Remote Team Meeting Planner</h1>
-          <AddTimeZoneButton onClick={handleAddTimeZone} />
+          <div className="flex items-center justify-center gap-8 mb-4">
+            <AddTimeZoneButton onClick={handleAddTimeZone} />
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="time-format"
+                checked={hour12Format}
+                onCheckedChange={setHour12Format}
+              />
+              <Label htmlFor="time-format">
+                {hour12Format ? '12-hour format' : '24-hour format'}
+              </Label>
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -55,7 +91,8 @@ const Index = () => {
             <TimeZoneCard 
               key={card.id} 
               id={card.id}
-              timezone={card.timezone} 
+              timezone={card.timezone}
+              hour12={hour12Format}
               onRemove={() => handleRemoveTimeZone(card.id)} 
             />
           ))}

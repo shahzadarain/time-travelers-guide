@@ -18,6 +18,7 @@ interface TimeZoneCardProps {
   onRemove?: () => void;
   sourceTime?: string;
   sourceTimezone?: string;
+  hour12?: boolean; // Added hour12 prop
 }
 
 export const TimeZoneCard = ({ 
@@ -28,7 +29,8 @@ export const TimeZoneCard = ({
   onTimeChange,
   onRemove,
   sourceTime,
-  sourceTimezone 
+  sourceTimezone,
+  hour12 = false // Default value for hour12
 }: TimeZoneCardProps) => {
   const [selectedTimezone, setSelectedTimezone] = useState(timezone || "UTC");
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -71,7 +73,7 @@ export const TimeZoneCard = ({
         timeZone: selectedTimezone,
         hour: "2-digit",
         minute: "2-digit",
-        hour12: false,
+        hour12: hour12, // Use hour12 prop
       });
     }
     return selectedTime;
@@ -83,7 +85,7 @@ export const TimeZoneCard = ({
       hour: "2-digit",
       minute: "2-digit",
       second: "2-digit",
-      hour12: false,
+      hour12: hour12, // Use hour12 prop
     });
   };
 
