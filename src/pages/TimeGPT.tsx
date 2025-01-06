@@ -36,20 +36,8 @@ const TimeGPT = () => {
     console.log("Starting time conversion for query:", query);
 
     try {
-      // Get the API key from Supabase secrets
-      const { data: secretData, error: secretError } = await supabase
-        .from('secrets')
-        .select('value')
-        .eq('name', 'PERPLEXITY_API_KEY')
-        .single();
-
-      if (secretError || !secretData?.value) {
-        console.error("Error fetching API key:", secretError);
-        throw new Error("Could not retrieve API key. Please ensure it's set in Supabase secrets.");
-      }
-
       // Make the API request
-      const perplexityResponse = await makePerplexityRequest(query, secretData.value);
+      const perplexityResponse = await makePerplexityRequest(query);
       
       if (!perplexityResponse.choices?.[0]?.message?.content) {
         throw new Error("Invalid API response format");
