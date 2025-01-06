@@ -16,7 +16,7 @@ const Index = () => {
     toast({ title: "Time Zone Added", description: "You can now select a new time zone." });
   };
 
-  const handleRemoveTimeZone = (id) => {
+  const handleRemoveTimeZone = (id: number) => {
     if (timeZoneCards.length > 1) {
       setTimeZoneCards(timeZoneCards.filter(card => card.id !== id));
       toast({ title: "Time Zone Removed", description: "You have removed a time zone." });
@@ -54,7 +54,7 @@ const Index = () => {
           {timeZoneCards.map((card) => (
             <TimeZoneCard 
               key={card.id} 
-              id={card.id} 
+              id={card.id}
               timezone={card.timezone} 
               onRemove={() => handleRemoveTimeZone(card.id)} 
             />

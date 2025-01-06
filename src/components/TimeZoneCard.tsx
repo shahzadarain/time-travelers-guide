@@ -10,6 +10,7 @@ import { CurrentTimeDisplay } from "./CurrentTimeDisplay";
 import { MeetingTimeDisplay } from "./MeetingTimeDisplay";
 
 interface TimeZoneCardProps {
+  id?: number;  // Added id prop
   isSource?: boolean;
   onTimeZoneChange?: (timezone: string) => void;
   onTimeChange?: (time: string) => void;
@@ -19,6 +20,7 @@ interface TimeZoneCardProps {
 }
 
 export const TimeZoneCard = ({ 
+  id,
   isSource = false, 
   onTimeZoneChange, 
   onTimeChange,
