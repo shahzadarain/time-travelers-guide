@@ -48,15 +48,25 @@ const Index = () => {
     shareText += `📅 Meeting Time: ${meetingTime} (${sourceTimezone})\n\n`;
     shareText += `Team Members' Local Times:\n`;
     
-    // Get all timezone cards including source
+    // Get all timezone cards
     const cards = document.querySelectorAll('.time-zone-card');
     cards.forEach((card) => {
-      const locationText = card.querySelector('.location-text')?.textContent;
-      const timeText = card.querySelector('.time-text')?.textContent;
-      if (locationText && timeText) {
-        shareText += `${locationText}: ${timeText}\n`;
+      const locationElement = card.querySelector('.location-text');
+      const timeElement = card.querySelector('.time-text');
+      
+      if (locationElement && timeElement) {
+        const location = locationElement.textContent?.trim();
+        const time = timeElement.textContent?.trim();
+        
+        console.log('Found card:', { location, time }); // Debug log
+        
+        if (location && time) {
+          shareText += `${location}: ${time}\n`;
+        }
       }
     });
+
+    console.log('Share text:', shareText); // Debug log
 
     try {
       await navigator.clipboard.writeText(shareText);
@@ -65,6 +75,7 @@ const Index = () => {
         description: "Time zones summary has been copied to your clipboard.",
       });
     } catch (err) {
+      console.error('Failed to copy:', err); // Debug log
       toast({
         title: "Failed to copy",
         description: "Please try again or copy manually.",
