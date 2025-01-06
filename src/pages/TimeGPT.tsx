@@ -35,19 +35,21 @@ const TimeGPT = () => {
     console.log("Starting time conversion for query:", query);
 
     try {
-      const { data: { PERPLEXITY_API_KEY }, error } = await supabase
+      const { data, error } = await supabase
         .from('secrets')
-        .select('PERPLEXITY_API_KEY')
+        .select('value')
+        .eq('name', 'PERPLEXITY_API_KEY')
         .single();
 
-      if (error || !PERPLEXITY_API_KEY) {
+      if (error || !data) {
         throw new Error("Could not retrieve API key from Supabase");
       }
 
-      const data = await makePerplexityRequest(query, PERPLEXITY_API_KEY);
-      console.log("API response:", data);
+      const apiKey = data.value;
+      const perplexityResponse = await makePerplexityRequest(query, apiKey);
+      console.log("API response:", perplexityResponse);
 
-      const content = data.choices[0].message.content.trim();
+      const content = perplexityResponse.choices[0].message.content.trim();
       console.log("Raw content:", content);
 
       const jsonStr = content.replace(/\n/g, '').trim();
