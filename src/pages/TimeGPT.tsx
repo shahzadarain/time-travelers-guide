@@ -35,7 +35,7 @@ const TimeGPT = () => {
     console.log("Starting time conversion for query:", query);
 
     try {
-      // Query the secrets table for the API key
+      // Get the API key from Supabase secrets
       const { data: secretData, error: secretError } = await supabase
         .from('secrets')
         .select('value')
@@ -44,26 +44,31 @@ const TimeGPT = () => {
 
       if (secretError || !secretData) {
         console.error("Error fetching API key:", secretError);
-        throw new Error("Could not retrieve API key from Supabase");
+        throw new Error("Could not retrieve API key");
       }
 
       const apiKey = secretData.value;
+      
+      // Make the API request
       const perplexityResponse = await makePerplexityRequest(query, apiKey);
-      console.log("API response:", perplexityResponse);
+      console.log("Perplexity response:", perplexityResponse);
+
+      if (!perplexityResponse.choices || !perplexityResponse.choices[0]?.message?.content) {
+        throw new Error("Invalid API response format");
+      }
 
       const content = perplexityResponse.choices[0].message.content.trim();
       console.log("Raw content:", content);
 
-      const jsonStr = content.replace(/\n/g, '').trim();
-      console.log("Cleaned JSON string:", jsonStr);
-
-      const extractedInfo = JSON.parse(jsonStr);
+      // Parse the JSON response
+      const extractedInfo = JSON.parse(content);
       console.log("Parsed info:", extractedInfo);
 
       if (!extractedInfo.sourceLocation || !extractedInfo.sourceTime || !extractedInfo.targetLocation) {
         throw new Error("Missing required fields in response");
       }
 
+      // Convert the times
       const sourceTimezone = findTimeZone(extractedInfo.sourceLocation);
       const targetTimezone = findTimeZone(extractedInfo.targetLocation);
 
@@ -88,6 +93,7 @@ const TimeGPT = () => {
         description: error instanceof Error ? error.message : "Failed to process your query. Please try again.",
         variant: "destructive",
       });
+      setResult(null);
     } finally {
       setIsLoading(false);
     }
