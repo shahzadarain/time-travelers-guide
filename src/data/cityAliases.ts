@@ -17,4 +17,11 @@ export const cityAliases: Record<string, string> = {
   "singapore": "Asia/Singapore",
   "hong kong": "Asia/Hong_Kong",
   "sydney": "Australia/Sydney",
+  
+  // Pakistan cities
+  "islamabad": "Asia/Karachi",
+  "karachi": "Asia/Karachi",
+  "lahore": "Asia/Karachi",
+  "rawalpindi": "Asia/Karachi",
+  "pakistan": "Asia/Karachi",
 };

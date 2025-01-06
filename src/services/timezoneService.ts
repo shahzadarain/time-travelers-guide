@@ -31,12 +31,27 @@ export const findTimeZone = (location: string) => {
   );
 
   if (!match) {
-    // Try matching just the city/country name
+    // Try matching any part of the location against zone labels
     match = allZones.find(zone => 
       locationParts.some(part => 
         zone.label.toLowerCase().includes(part.trim())
       )
     );
+  }
+
+  if (!match) {
+    // Try matching against continent/region names
+    const continent = timeZones.find(cont => 
+      locationParts.some(part => 
+        cont.continent.toLowerCase().includes(part.trim())
+      )
+    );
+    
+    if (continent && continent.zones.length > 0) {
+      // Use the first timezone in the matched continent as a fallback
+      match = continent.zones[0];
+      console.log(`Found continent match, using first timezone:`, match);
+    }
   }
 
   if (match) {
