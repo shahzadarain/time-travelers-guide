@@ -70,6 +70,16 @@ export const TimeZoneCard = ({
     return selectedTime;
   };
 
+  const getCurrentTime = () => {
+    return currentTime.toLocaleTimeString(undefined, {
+      timeZone: selectedTimezone,
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    });
+  };
+
   const selectedZone = timeZones
     .flatMap(continent => continent.zones)
     .find(zone => zone.value === selectedTimezone);
@@ -137,20 +147,36 @@ export const TimeZoneCard = ({
             </PopoverContent>
           </Popover>
           
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
+          <div className="space-y-4">
+            {/* Current Time Display */}
+            <div className="flex items-center space-x-2 p-3 rounded-md bg-secondary/50">
               <Clock className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm font-medium text-muted-foreground">Current:</span>
+              <span className="text-lg font-semibold text-primary">
+                {getCurrentTime()}
+              </span>
+            </div>
+
+            {/* Selected/Converted Time Display */}
+            <div className="flex items-center space-x-2 p-3 rounded-md bg-primary/10">
+              <Clock className="h-4 w-4 text-primary" />
               {isSource ? (
-                <Input
-                  type="time"
-                  value={selectedTime}
-                  onChange={handleTimeChange}
-                  className="w-32"
-                />
+                <>
+                  <span className="text-sm font-medium text-muted-foreground">Selected:</span>
+                  <Input
+                    type="time"
+                    value={selectedTime}
+                    onChange={handleTimeChange}
+                    className="w-32"
+                  />
+                </>
               ) : (
-                <span className="text-2xl font-bold">
-                  {getConvertedTime()}
-                </span>
+                <>
+                  <span className="text-sm font-medium text-muted-foreground">Converted:</span>
+                  <span className="text-2xl font-bold text-primary">
+                    {getConvertedTime()}
+                  </span>
+                </>
               )}
             </div>
           </div>
