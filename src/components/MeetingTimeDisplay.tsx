@@ -5,9 +5,10 @@ interface MeetingTimeDisplayProps {
   isSource: boolean;
   time: string;
   onTimeChange?: (time: string) => void;
+  className?: string; // Added className prop
 }
 
-export const MeetingTimeDisplay = ({ isSource, time, onTimeChange }: MeetingTimeDisplayProps) => {
+export const MeetingTimeDisplay = ({ isSource, time, onTimeChange, className }: MeetingTimeDisplayProps) => {
   return (
     <div className="flex flex-col space-y-2 p-4 rounded-md bg-primary/10">
       {isSource ? (
@@ -31,7 +32,7 @@ export const MeetingTimeDisplay = ({ isSource, time, onTimeChange }: MeetingTime
           <span className="text-sm font-medium text-muted-foreground">Equivalent Meeting Time</span>
           <div className="flex items-center space-x-2">
             <Clock className="h-4 w-4 text-primary" />
-            <span className="text-2xl font-bold text-primary">
+            <span className={`text-2xl font-bold text-primary ${className}`}>
               {time}
             </span>
           </div>
