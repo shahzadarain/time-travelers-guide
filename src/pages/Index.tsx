@@ -23,11 +23,16 @@ const Index = () => {
   const [hour12Format, setHour12Format] = useState(() => {
     try {
       const saved = localStorage.getItem("timeFormat");
-      if (saved === null) return true; // Default value if not set
-      const parsed = JSON.parse(saved);
-      return typeof parsed === 'boolean' ? parsed : true;
+      // Clear invalid data if it exists
+      if (saved && (saved === "true" || saved === "false")) {
+        return JSON.parse(saved);
+      } else {
+        localStorage.removeItem("timeFormat");
+        return true; // Default value
+      }
     } catch (error) {
       console.error("Error parsing timeFormat from localStorage:", error);
+      localStorage.removeItem("timeFormat"); // Clear invalid data
       return true; // Default to 12-hour format on error
     }
   });

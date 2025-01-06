@@ -62,13 +62,12 @@ const TimeGPT = () => {
           messages: [
             {
               role: "system",
-              content: `You are a time conversion assistant. Extract time conversion details from the query and respond ONLY with a JSON object containing these fields:
+              content: `You are a time conversion assistant. You MUST respond with ONLY a valid JSON object in this exact format, with no additional text:
               {
-                "sourceLocation": "location where the time is known",
-                "sourceTime": "time in HH:mm format",
-                "targetLocation": "location where we want to know the time"
-              }
-              Example: {"sourceLocation": "New York", "sourceTime": "14:30", "targetLocation": "London"}`
+                "sourceLocation": "LOCATION",
+                "sourceTime": "HH:mm",
+                "targetLocation": "LOCATION"
+              }`
             },
             {
               role: "user",
@@ -86,15 +85,19 @@ const TimeGPT = () => {
       const data = await response.json();
       console.log("Perplexity API response:", data);
 
-      // Extract the content and parse it as JSON
       let extractedInfo;
       try {
-        // The actual JSON response is in the message content
-        extractedInfo = JSON.parse(data.choices[0].message.content);
+        const content = data.choices[0].message.content.trim();
+        console.log("Raw API response content:", content);
+        extractedInfo = JSON.parse(content);
         console.log("Parsed extracted info:", extractedInfo);
+
+        if (!extractedInfo.sourceLocation || !extractedInfo.sourceTime || !extractedInfo.targetLocation) {
+          throw new Error("Invalid response format: missing required fields");
+        }
       } catch (error) {
         console.error("Error parsing API response:", error);
-        throw new Error("Invalid response format from API");
+        throw new Error("Failed to parse time information from response");
       }
 
       // Find timezone identifiers
