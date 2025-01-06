@@ -48,30 +48,30 @@ const Index = () => {
     shareText += `📅 Meeting Time: ${meetingTime} (${sourceTimezone})\n\n`;
     shareText += `Team Members' Local Times:\n`;
     
-    // First, get the source time zone card
-    const sourceCard = document.querySelector('.time-zone-card');
-    if (sourceCard) {
-      const sourceLocation = sourceCard.querySelector('.location-text')?.textContent?.trim();
-      const sourceTime = sourceCard.querySelector('.time-text')?.textContent?.trim();
-      if (sourceLocation && sourceTime) {
-        shareText += `${sourceLocation}: ${sourceTime}\n`;
-      }
-    }
-
-    // Then get all non-source time zone cards
-    const teamCards = document.querySelectorAll('.time-zone-card:not(:first-child)');
-    teamCards.forEach((card) => {
+    // Get all timezone cards including source
+    const cards = document.querySelectorAll('.time-zone-card');
+    
+    cards.forEach((card, index) => {
+      // Get the location text (includes "Meeting Time Zone" or "Team Member Time Zone")
       const locationElement = card.querySelector('.location-text');
-      const timeElement = card.querySelector('.time-text');
+      // Get both the input time (for source) and display time (for team members)
+      const timeElement = card.querySelector('.time-text') || card.querySelector('input[type="time"]');
       
       if (locationElement && timeElement) {
         const location = locationElement.textContent?.trim();
-        const time = timeElement.textContent?.trim();
+        // Handle both input and display time elements
+        const time = timeElement instanceof HTMLInputElement ? timeElement.value : timeElement.textContent?.trim();
         
-        console.log('Found team card:', { location, time }); // Debug log
+        console.log('Processing card:', { index, location, time }); // Debug log
         
         if (location && time) {
-          shareText += `${location}: ${time}\n`;
+          // Format the location to be more readable
+          const formattedLocation = location === "Meeting Time Zone" ? "Source" : `Team Member ${index}`;
+          // Get the selected timezone from the button text
+          const timezoneButton = card.querySelector('[role="combobox"]');
+          const timezone = timezoneButton?.textContent?.trim() || '';
+          
+          shareText += `${formattedLocation} (${timezone}): ${time}\n`;
         }
       }
     });
