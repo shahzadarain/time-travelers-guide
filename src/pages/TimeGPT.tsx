@@ -32,6 +32,7 @@ const TimeGPT = () => {
     }
 
     setIsLoading(true);
+    setResult(null);
     console.log("Starting time conversion for query:", query);
 
     try {
@@ -42,18 +43,15 @@ const TimeGPT = () => {
         .eq('name', 'PERPLEXITY_API_KEY')
         .single();
 
-      if (secretError || !secretData) {
+      if (secretError || !secretData?.value) {
         console.error("Error fetching API key:", secretError);
-        throw new Error("Could not retrieve API key");
+        throw new Error("Could not retrieve API key. Please ensure it's set in Supabase secrets.");
       }
 
-      const apiKey = secretData.value;
-      
       // Make the API request
-      const perplexityResponse = await makePerplexityRequest(query, apiKey);
-      console.log("Perplexity response:", perplexityResponse);
-
-      if (!perplexityResponse.choices || !perplexityResponse.choices[0]?.message?.content) {
+      const perplexityResponse = await makePerplexityRequest(query, secretData.value);
+      
+      if (!perplexityResponse.choices?.[0]?.message?.content) {
         throw new Error("Invalid API response format");
       }
 
@@ -61,10 +59,16 @@ const TimeGPT = () => {
       console.log("Raw content:", content);
 
       // Parse the JSON response
-      const extractedInfo = JSON.parse(content);
-      console.log("Parsed info:", extractedInfo);
+      let extractedInfo;
+      try {
+        extractedInfo = JSON.parse(content);
+      } catch (parseError) {
+        console.error("JSON parse error:", parseError);
+        throw new Error("Failed to parse API response");
+      }
 
       if (!extractedInfo.sourceLocation || !extractedInfo.sourceTime || !extractedInfo.targetLocation) {
+        console.error("Missing fields in response:", extractedInfo);
         throw new Error("Missing required fields in response");
       }
 
@@ -73,7 +77,9 @@ const TimeGPT = () => {
       const targetTimezone = findTimeZone(extractedInfo.targetLocation);
 
       if (!sourceTimezone || !targetTimezone) {
-        throw new Error(`Could not find timezone for ${!sourceTimezone ? extractedInfo.sourceLocation : extractedInfo.targetLocation}`);
+        throw new Error(
+          `Could not find timezone for ${!sourceTimezone ? extractedInfo.sourceLocation : extractedInfo.targetLocation}`
+        );
       }
 
       const sourceDate = createTimeFromString(extractedInfo.sourceTime);
@@ -93,7 +99,6 @@ const TimeGPT = () => {
         description: error instanceof Error ? error.message : "Failed to process your query. Please try again.",
         variant: "destructive",
       });
-      setResult(null);
     } finally {
       setIsLoading(false);
     }

@@ -7,6 +7,7 @@ export const makePerplexityRequest = async (query: string, apiKey: string) => {
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
+        Accept: "application/json",
       },
       body: JSON.stringify({
         model: "llama-3.1-sonar-small-128k-online",
@@ -28,13 +29,23 @@ For the time, always convert to 24-hour format.`
     });
 
     if (!response.ok) {
-      const errorData = await response.text();
-      console.error("API Error Response:", errorData);
-      throw new Error(`API request failed: ${response.status} ${errorData}`);
+      const errorText = await response.text();
+      console.error("API Error Response:", {
+        status: response.status,
+        statusText: response.statusText,
+        body: errorText
+      });
+      throw new Error(`API request failed: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
     console.log("API Response:", data);
+    
+    if (!data.choices?.[0]?.message?.content) {
+      console.error("Invalid API response format:", data);
+      throw new Error("Invalid response format from API");
+    }
+
     return data;
   } catch (error) {
     console.error("Error in makePerplexityRequest:", error);
