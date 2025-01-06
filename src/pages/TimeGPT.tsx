@@ -51,7 +51,6 @@ const TimeGPT = () => {
     console.log("Starting time conversion for query:", query);
 
     try {
-      // Call Perplexity API to parse the query
       const response = await fetch("https://api.perplexity.ai/chat/completions", {
         method: "POST",
         headers: {
@@ -63,11 +62,13 @@ const TimeGPT = () => {
           messages: [
             {
               role: "system",
-              content: `Extract time conversion details from the query in JSON format with these fields:
-                sourceLocation: the origin location
-                sourceTime: the time in the origin location (in HH:mm format)
-                targetLocation: the destination location
-                Example output: {"sourceLocation": "Jordan", "sourceTime": "09:30", "targetLocation": "Geneva"}`
+              content: `You are a time conversion assistant. Extract time conversion details from the query and respond ONLY with a JSON object containing these fields:
+              {
+                "sourceLocation": "location where the time is known",
+                "sourceTime": "time in HH:mm format",
+                "targetLocation": "location where we want to know the time"
+              }
+              Example: {"sourceLocation": "New York", "sourceTime": "14:30", "targetLocation": "London"}`
             },
             {
               role: "user",
@@ -85,8 +86,16 @@ const TimeGPT = () => {
       const data = await response.json();
       console.log("Perplexity API response:", data);
 
-      const extractedInfo = JSON.parse(data.choices[0].message.content);
-      console.log("Extracted info:", extractedInfo);
+      // Extract the content and parse it as JSON
+      let extractedInfo;
+      try {
+        // The actual JSON response is in the message content
+        extractedInfo = JSON.parse(data.choices[0].message.content);
+        console.log("Parsed extracted info:", extractedInfo);
+      } catch (error) {
+        console.error("Error parsing API response:", error);
+        throw new Error("Invalid response format from API");
+      }
 
       // Find timezone identifiers
       const sourceTimezone = findTimeZone(extractedInfo.sourceLocation);
@@ -118,7 +127,7 @@ const TimeGPT = () => {
       console.error("Error during conversion:", error);
       toast({
         title: "Conversion Error",
-        description: "Failed to process your query. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to process your query. Please try again.",
         variant: "destructive",
       });
     } finally {
