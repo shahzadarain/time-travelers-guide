@@ -23,9 +23,32 @@ const TimeGPT = () => {
 
   const findTimeZone = (location: string) => {
     const allZones = timeZones.flatMap(continent => continent.zones);
-    return allZones.find(zone => 
-      zone.label.toLowerCase().includes(location.toLowerCase())
-    )?.value;
+    const normalizedLocation = location.toLowerCase();
+    
+    console.log(`Searching for timezone for location: ${location}`);
+    
+    // Try exact match first
+    let match = allZones.find(zone => 
+      zone.label.toLowerCase().includes(normalizedLocation)
+    );
+
+    if (!match) {
+      // Try matching just the city/country name
+      const locationParts = normalizedLocation.split(/[,-\s]+/);
+      match = allZones.find(zone => 
+        locationParts.some(part => 
+          zone.label.toLowerCase().includes(part.trim())
+        )
+      );
+    }
+
+    if (match) {
+      console.log(`Found timezone match:`, match);
+      return match.value;
+    }
+
+    console.log(`No timezone found for location: ${location}`);
+    return null;
   };
 
   const handleConversion = async () => {
@@ -63,7 +86,8 @@ const TimeGPT = () => {
             {
               role: "system",
               content: `You are a time conversion assistant. Extract time and location information from the query and respond with ONLY a JSON object in this EXACT format, with NO additional text or explanation:
-{"sourceLocation":"LOCATION","sourceTime":"HH:mm","targetLocation":"LOCATION"}`
+{"sourceLocation":"LOCATION","sourceTime":"HH:mm","targetLocation":"LOCATION"}
+Use only city or country names without extra words. For example: "Paris", "Tokyo", "United States", etc.`
             },
             {
               role: "user",
@@ -100,7 +124,13 @@ const TimeGPT = () => {
       const targetTimezone = findTimeZone(extractedInfo.targetLocation);
 
       if (!sourceTimezone || !targetTimezone) {
-        throw new Error("Could not find timezone for one or both locations");
+        console.error("Timezone lookup failed:", {
+          sourceLocation: extractedInfo.sourceLocation,
+          sourceTimezone,
+          targetLocation: extractedInfo.targetLocation,
+          targetTimezone
+        });
+        throw new Error(`Could not find timezone for ${!sourceTimezone ? extractedInfo.sourceLocation : extractedInfo.targetLocation}`);
       }
 
       // Parse the time and create a Date object for today
@@ -148,7 +178,7 @@ const TimeGPT = () => {
           
           <div className="space-y-2">
             <Input
-              placeholder="Example: I have a meeting at Jordan time 9:30 AM, what time will it be in Geneva?"
+              placeholder="Example: What time is 3:00 PM in Paris when it's that time in Tokyo?"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="w-full"
