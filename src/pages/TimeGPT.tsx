@@ -6,6 +6,7 @@ import { TimeConversionResult } from "@/components/TimeConversionResult";
 import { makePerplexityRequest } from "@/utils/perplexityApi";
 import { findTimeZone, convertTime, createTimeFromString } from "@/services/timezoneService";
 import { format } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
 
 interface TimeConversion {
   sourceLocation: string;
@@ -16,21 +17,11 @@ interface TimeConversion {
 
 const TimeGPT = () => {
   const [query, setQuery] = useState("");
-  const [apiKey, setApiKey] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<TimeConversion | null>(null);
   const { toast } = useToast();
 
   const handleConversion = async () => {
-    if (!apiKey) {
-      toast({
-        title: "API Key Required",
-        description: "Please enter your Perplexity API key to use this feature.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     if (!query.trim()) {
       toast({
         title: "Query Required",
@@ -44,7 +35,16 @@ const TimeGPT = () => {
     console.log("Starting time conversion for query:", query);
 
     try {
-      const data = await makePerplexityRequest(query, apiKey);
+      const { data: { PERPLEXITY_API_KEY }, error } = await supabase
+        .from('secrets')
+        .select('PERPLEXITY_API_KEY')
+        .single();
+
+      if (error || !PERPLEXITY_API_KEY) {
+        throw new Error("Could not retrieve API key from Supabase");
+      }
+
+      const data = await makePerplexityRequest(query, PERPLEXITY_API_KEY);
       console.log("API response:", data);
 
       const content = data.choices[0].message.content.trim();
@@ -97,10 +97,8 @@ const TimeGPT = () => {
         
         <TimeConversionForm
           query={query}
-          apiKey={apiKey}
           isLoading={isLoading}
           onQueryChange={setQuery}
-          onApiKeyChange={setApiKey}
           onSubmit={handleConversion}
         />
 
