@@ -23,21 +23,31 @@ const Index = () => {
   const [hour12Format, setHour12Format] = useState(() => {
     try {
       const saved = localStorage.getItem("timeFormat");
-      return saved ? JSON.parse(saved) : true;
+      if (saved === null) return true; // Default value if not set
+      const parsed = JSON.parse(saved);
+      return typeof parsed === 'boolean' ? parsed : true;
     } catch (error) {
       console.error("Error parsing timeFormat from localStorage:", error);
-      return true;
+      return true; // Default to 12-hour format on error
     }
   });
 
   // Save time format preference
   useEffect(() => {
-    localStorage.setItem("timeFormat", JSON.stringify(hour12Format));
+    try {
+      localStorage.setItem("timeFormat", JSON.stringify(hour12Format));
+    } catch (error) {
+      console.error("Error saving timeFormat to localStorage:", error);
+    }
   }, [hour12Format]);
 
   // Save timezone cards
   useEffect(() => {
-    localStorage.setItem("timeZoneCards", JSON.stringify(timeZoneCards));
+    try {
+      localStorage.setItem("timeZoneCards", JSON.stringify(timeZoneCards));
+    } catch (error) {
+      console.error("Error saving timeZoneCards to localStorage:", error);
+    }
   }, [timeZoneCards]);
 
   const handleAddTimeZone = () => {
