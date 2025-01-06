@@ -62,12 +62,8 @@ const TimeGPT = () => {
           messages: [
             {
               role: "system",
-              content: `You are a time conversion assistant. You MUST respond with ONLY a valid JSON object in this exact format, with no additional text:
-              {
-                "sourceLocation": "LOCATION",
-                "sourceTime": "HH:mm",
-                "targetLocation": "LOCATION"
-              }`
+              content: `You are a time conversion assistant. Extract time and location information from the query and respond with ONLY a JSON object in this EXACT format, with NO additional text or explanation:
+{"sourceLocation":"LOCATION","sourceTime":"HH:mm","targetLocation":"LOCATION"}`
             },
             {
               role: "user",
@@ -83,21 +79,20 @@ const TimeGPT = () => {
       }
 
       const data = await response.json();
-      console.log("Perplexity API response:", data);
+      console.log("API response:", data);
 
-      let extractedInfo;
-      try {
-        const content = data.choices[0].message.content.trim();
-        console.log("Raw API response content:", content);
-        extractedInfo = JSON.parse(content);
-        console.log("Parsed extracted info:", extractedInfo);
+      const content = data.choices[0].message.content.trim();
+      console.log("Raw content:", content);
 
-        if (!extractedInfo.sourceLocation || !extractedInfo.sourceTime || !extractedInfo.targetLocation) {
-          throw new Error("Invalid response format: missing required fields");
-        }
-      } catch (error) {
-        console.error("Error parsing API response:", error);
-        throw new Error("Failed to parse time information from response");
+      // Ensure we're working with a clean JSON string
+      const jsonStr = content.replace(/\n/g, '').trim();
+      console.log("Cleaned JSON string:", jsonStr);
+
+      const extractedInfo = JSON.parse(jsonStr);
+      console.log("Parsed info:", extractedInfo);
+
+      if (!extractedInfo.sourceLocation || !extractedInfo.sourceTime || !extractedInfo.targetLocation) {
+        throw new Error("Missing required fields in response");
       }
 
       // Find timezone identifiers
@@ -123,8 +118,6 @@ const TimeGPT = () => {
         targetLocation: extractedInfo.targetLocation,
         convertedTime,
       });
-
-      console.log("Conversion result:", result);
 
     } catch (error) {
       console.error("Error during conversion:", error);
