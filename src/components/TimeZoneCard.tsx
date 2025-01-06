@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Check, ChevronsUpDown, Clock, Globe } from "lucide-react";
@@ -156,31 +156,33 @@ export const TimeZoneCard = ({ isSource = false, onTimeZoneChange }: TimeZoneCar
             <PopoverContent className="w-[400px] p-0" align="start">
               <Command>
                 <CommandInput placeholder="Search time zone..." />
-                <CommandEmpty>No time zone found.</CommandEmpty>
-                <div className="max-h-[300px] overflow-y-auto">
-                  {timeZones.map((continent) => (
-                    <CommandGroup key={continent.continent} heading={continent.continent}>
-                      {continent.zones.map((zone) => (
-                        <CommandItem
-                          key={zone.value}
-                          value={zone.value}
-                          onSelect={handleTimezoneChange}
-                        >
-                          <span className="flex items-center gap-2">
-                            <span>{zone.flag}</span>
-                            <span>{zone.label}</span>
-                          </span>
-                          <Check
-                            className={cn(
-                              "ml-auto h-4 w-4",
-                              selectedTimezone === zone.value ? "opacity-100" : "opacity-0"
-                            )}
-                          />
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  ))}
-                </div>
+                <CommandList>
+                  <CommandEmpty>No time zone found.</CommandEmpty>
+                  <div className="max-h-[300px] overflow-y-auto">
+                    {timeZones.map((continent) => (
+                      <CommandGroup key={continent.continent} heading={continent.continent}>
+                        {continent.zones.map((zone) => (
+                          <CommandItem
+                            key={zone.value}
+                            value={zone.value}
+                            onSelect={handleTimezoneChange}
+                          >
+                            <span className="flex items-center gap-2">
+                              <span>{zone.flag}</span>
+                              <span>{zone.label}</span>
+                            </span>
+                            <Check
+                              className={cn(
+                                "ml-auto h-4 w-4",
+                                selectedTimezone === zone.value ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    ))}
+                  </div>
+                </CommandList>
               </Command>
             </PopoverContent>
           </Popover>
