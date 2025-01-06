@@ -1,12 +1,29 @@
 import { timeZones } from "@/data/timeZones";
+import { cityAliases } from "@/data/cityAliases";
 import { formatInTimeZone } from "date-fns-tz";
-import { format } from "date-fns";
 
 export const findTimeZone = (location: string) => {
-  const allZones = timeZones.flatMap(continent => continent.zones);
-  const normalizedLocation = location.toLowerCase();
+  const normalizedLocation = location.toLowerCase().trim();
   
   console.log(`Searching for timezone for location: ${location}`);
+  
+  // First check if we have a direct alias match
+  if (cityAliases[normalizedLocation]) {
+    console.log(`Found timezone through alias: ${cityAliases[normalizedLocation]}`);
+    return cityAliases[normalizedLocation];
+  }
+
+  // Check if any part of the location matches an alias
+  const locationParts = normalizedLocation.split(/[,-\s]+/);
+  for (const part of locationParts) {
+    if (cityAliases[part]) {
+      console.log(`Found timezone through partial alias match: ${cityAliases[part]}`);
+      return cityAliases[part];
+    }
+  }
+
+  // If no alias found, search through timezone database
+  const allZones = timeZones.flatMap(continent => continent.zones);
   
   // Try exact match first
   let match = allZones.find(zone => 
@@ -15,7 +32,6 @@ export const findTimeZone = (location: string) => {
 
   if (!match) {
     // Try matching just the city/country name
-    const locationParts = normalizedLocation.split(/[,-\s]+/);
     match = allZones.find(zone => 
       locationParts.some(part => 
         zone.label.toLowerCase().includes(part.trim())
