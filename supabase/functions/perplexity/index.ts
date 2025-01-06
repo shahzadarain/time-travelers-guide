@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,6 +14,27 @@ serve(async (req) => {
   }
 
   try {
+    // Get the JWT token from the request headers
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      throw new Error('Missing Authorization header');
+    }
+
+    // Create a Supabase client using the auth token
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        global: { headers: { Authorization: authHeader } },
+      }
+    );
+
+    // Verify the user is authenticated
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    if (authError || !user) {
+      throw new Error('Unauthorized');
+    }
+
     const PERPLEXITY_API_KEY = Deno.env.get('PERPLEXITY_API_KEY');
     if (!PERPLEXITY_API_KEY) {
       throw new Error('PERPLEXITY_API_KEY is not set');
@@ -52,9 +74,12 @@ For the time, always convert to 24-hour format.`
     });
   } catch (error) {
     console.error('Error:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return new Response(
+      JSON.stringify({ error: error.message }), 
+      { 
+        status: error.message === 'Unauthorized' ? 401 : 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
   }
 });

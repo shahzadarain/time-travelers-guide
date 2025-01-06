@@ -4,11 +4,16 @@ export const makePerplexityRequest = async (query: string, apiKey: string) => {
   console.log("Making Perplexity API request for query:", query);
   
   try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      throw new Error("No session found");
+    }
+
     const response = await fetch("https://cvqssrfmkgnbnkoqqtsj.supabase.co/functions/v1/perplexity", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`,
+        "Authorization": `Bearer ${session.access_token}`,
       },
       body: JSON.stringify({ query }),
     });
