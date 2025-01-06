@@ -25,6 +25,45 @@ export const TimeZoneCard = ({ isSource = false, onTimeZoneChange }: TimeZoneCar
     onTimeZoneChange?.(value);
   };
 
+  const timeZones = [
+    { value: "UTC", label: "UTC (Coordinated Universal Time)" },
+    // Americas
+    { value: "America/New_York", label: "New York (EST/EDT)" },
+    { value: "America/Chicago", label: "Chicago (CST/CDT)" },
+    { value: "America/Denver", label: "Denver (MST/MDT)" },
+    { value: "America/Los_Angeles", label: "Los Angeles (PST/PDT)" },
+    { value: "America/Toronto", label: "Toronto (EST/EDT)" },
+    { value: "America/Vancouver", label: "Vancouver (PST/PDT)" },
+    { value: "America/Mexico_City", label: "Mexico City (CST/CDT)" },
+    { value: "America/Sao_Paulo", label: "São Paulo (BRT)" },
+    { value: "America/Buenos_Aires", label: "Buenos Aires (ART)" },
+    // Europe
+    { value: "Europe/London", label: "London (GMT/BST)" },
+    { value: "Europe/Paris", label: "Paris (CET/CEST)" },
+    { value: "Europe/Berlin", label: "Berlin (CET/CEST)" },
+    { value: "Europe/Rome", label: "Rome (CET/CEST)" },
+    { value: "Europe/Madrid", label: "Madrid (CET/CEST)" },
+    { value: "Europe/Moscow", label: "Moscow (MSK)" },
+    // Asia
+    { value: "Asia/Tokyo", label: "Tokyo (JST)" },
+    { value: "Asia/Shanghai", label: "Shanghai (CST)" },
+    { value: "Asia/Singapore", label: "Singapore (SGT)" },
+    { value: "Asia/Dubai", label: "Dubai (GST)" },
+    { value: "Asia/Hong_Kong", label: "Hong Kong (HKT)" },
+    { value: "Asia/Seoul", label: "Seoul (KST)" },
+    { value: "Asia/Kolkata", label: "Mumbai/Kolkata (IST)" },
+    // Oceania
+    { value: "Australia/Sydney", label: "Sydney (AEST/AEDT)" },
+    { value: "Australia/Melbourne", label: "Melbourne (AEST/AEDT)" },
+    { value: "Australia/Perth", label: "Perth (AWST)" },
+    { value: "Pacific/Auckland", label: "Auckland (NZST/NZDT)" },
+    // Africa
+    { value: "Africa/Cairo", label: "Cairo (EET)" },
+    { value: "Africa/Johannesburg", label: "Johannesburg (SAST)" },
+    { value: "Africa/Lagos", label: "Lagos (WAT)" },
+    { value: "Africa/Nairobi", label: "Nairobi (EAT)" },
+  ];
+
   return (
     <Card className="w-full animate-fade-in">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -40,11 +79,11 @@ export const TimeZoneCard = ({ isSource = false, onTimeZoneChange }: TimeZoneCar
               <SelectValue placeholder="Select time zone" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="UTC">UTC</SelectItem>
-              <SelectItem value="America/New_York">New York (EST)</SelectItem>
-              <SelectItem value="Europe/London">London (GMT)</SelectItem>
-              <SelectItem value="Asia/Tokyo">Tokyo (JST)</SelectItem>
-              <SelectItem value="Australia/Sydney">Sydney (AEST)</SelectItem>
+              {timeZones.map((tz) => (
+                <SelectItem key={tz.value} value={tz.value}>
+                  {tz.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           
