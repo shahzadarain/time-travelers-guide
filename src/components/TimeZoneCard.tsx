@@ -10,7 +10,8 @@ import { CurrentTimeDisplay } from "./CurrentTimeDisplay";
 import { MeetingTimeDisplay } from "./MeetingTimeDisplay";
 
 interface TimeZoneCardProps {
-  id?: number;  // Added id prop
+  id?: number;
+  timezone?: string;  // Added timezone prop
   isSource?: boolean;
   onTimeZoneChange?: (timezone: string) => void;
   onTimeChange?: (time: string) => void;
@@ -21,6 +22,7 @@ interface TimeZoneCardProps {
 
 export const TimeZoneCard = ({ 
   id,
+  timezone,  // Added timezone to destructuring
   isSource = false, 
   onTimeZoneChange, 
   onTimeChange,
@@ -28,7 +30,7 @@ export const TimeZoneCard = ({
   sourceTime,
   sourceTimezone 
 }: TimeZoneCardProps) => {
-  const [selectedTimezone, setSelectedTimezone] = useState("UTC");
+  const [selectedTimezone, setSelectedTimezone] = useState(timezone || "UTC");
   const [currentTime, setCurrentTime] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState(
     new Date().toLocaleTimeString(undefined, {
