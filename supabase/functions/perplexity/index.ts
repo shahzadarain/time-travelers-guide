@@ -30,7 +30,7 @@ serve(async (req) => {
         'Accept': 'application/json'
       },
       body: JSON.stringify({
-        model: 'mistral-7b-instruct',
+        model: 'llama-3.1-sonar-small-128k-online',
         messages: [
           {
             role: 'system',
