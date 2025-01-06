@@ -9,26 +9,16 @@ export const makePerplexityRequest = async (query: string, apiKey: string) => {
       throw new Error("No session found");
     }
 
-    const response = await fetch("https://cvqssrfmkgnbnkoqqtsj.supabase.co/functions/v1/perplexity", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${session.access_token}`,
-      },
-      body: JSON.stringify({ query }),
+    // Make the request to our Edge Function
+    const { data, error } = await supabase.functions.invoke('perplexity', {
+      body: { query }
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("API Error Response:", {
-        status: response.status,
-        statusText: response.statusText,
-        body: errorText
-      });
-      throw new Error(`API request failed: ${response.status} - ${errorText}`);
+    if (error) {
+      console.error("Edge Function Error:", error);
+      throw error;
     }
 
-    const data = await response.json();
     console.log("API Response:", data);
     
     if (!data.choices?.[0]?.message?.content) {

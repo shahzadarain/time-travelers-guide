@@ -41,8 +41,7 @@ serve(async (req) => {
     }
 
     const { query } = await req.json();
-
-    console.log("Making request to Perplexity API with query:", query);
+    console.log("Processing query:", query);
 
     const response = await fetch('https://api.perplexity.ai/chat/completions', {
       method: 'POST',
@@ -65,7 +64,7 @@ For the time, always convert to 24-hour format.`
             role: 'user',
             content: query
           }
-        ],
+        ]
       }),
     });
 
