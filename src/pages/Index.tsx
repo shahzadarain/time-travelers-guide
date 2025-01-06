@@ -10,10 +10,24 @@ import { Label } from "@/components/ui/label";
 
 const Index = () => {
   const { toast } = useToast();
-  const [timeZoneCards, setTimeZoneCards] = useState([{ id: 1, timezone: "UTC" }]);
+  const [timeZoneCards, setTimeZoneCards] = useState(() => {
+    try {
+      const saved = localStorage.getItem("timeZoneCards");
+      return saved ? JSON.parse(saved) : [{ id: 1, timezone: "UTC" }];
+    } catch (error) {
+      console.error("Error parsing timeZoneCards from localStorage:", error);
+      return [{ id: 1, timezone: "UTC" }];
+    }
+  });
+
   const [hour12Format, setHour12Format] = useState(() => {
-    const saved = localStorage.getItem("timeFormat");
-    return saved ? JSON.parse(saved) : true;
+    try {
+      const saved = localStorage.getItem("timeFormat");
+      return saved ? JSON.parse(saved) : true;
+    } catch (error) {
+      console.error("Error parsing timeFormat from localStorage:", error);
+      return true;
+    }
   });
 
   // Save time format preference
@@ -25,14 +39,6 @@ const Index = () => {
   useEffect(() => {
     localStorage.setItem("timeZoneCards", JSON.stringify(timeZoneCards));
   }, [timeZoneCards]);
-
-  // Load saved timezone cards on mount
-  useEffect(() => {
-    const savedCards = localStorage.getItem("timeZoneCards");
-    if (savedCards) {
-      setTimeZoneCards(JSON.parse(savedCards));
-    }
-  }, []);
 
   const handleAddTimeZone = () => {
     const newId = Math.max(...timeZoneCards.map(card => card.id), 0) + 1;
