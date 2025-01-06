@@ -13,7 +13,7 @@ export const DigitalClock = ({ timezone, currentTime }: DigitalClockProps) => {
   });
 
   return (
-    <div className="text-8xl font-mono font-bold tracking-wider">
+    <div className="text-4xl md:text-5xl font-mono font-bold tracking-wider text-primary">
       {time}
     </div>
   );

@@ -7,6 +7,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { timeZones } from "@/data/timeZones";
 import { cn } from "@/lib/utils";
 import { DigitalClock } from "@/components/DigitalClock";
+import { useToast } from "@/components/ui/use-toast";
 
 interface TimeZoneCard {
   id: number;
@@ -17,6 +18,7 @@ export const WorldClock = () => {
   const [timeZoneCards, setTimeZoneCards] = useState<TimeZoneCard[]>([{ id: 1, timezone: "UTC" }]);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [openPopovers, setOpenPopovers] = useState<{ [key: number]: boolean }>({});
+  const { toast } = useToast();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -29,11 +31,19 @@ export const WorldClock = () => {
   const handleAddTimeZone = () => {
     const newId = Math.max(...timeZoneCards.map(card => card.id), 0) + 1;
     setTimeZoneCards([...timeZoneCards, { id: newId, timezone: "UTC" }]);
+    toast({
+      title: "Time Zone Added",
+      description: "New time zone card has been added.",
+    });
   };
 
   const handleRemoveTimeZone = (id: number) => {
     if (timeZoneCards.length > 1) {
       setTimeZoneCards(timeZoneCards.filter(card => card.id !== id));
+      toast({
+        title: "Time Zone Removed",
+        description: "Time zone card has been removed.",
+      });
     }
   };
 
@@ -42,14 +52,21 @@ export const WorldClock = () => {
       card.id === id ? { ...card, timezone: newTimezone } : card
     ));
     setOpenPopovers({ ...openPopovers, [id]: false });
+    toast({
+      title: "Time Zone Updated",
+      description: "Time zone has been changed successfully.",
+    });
   };
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-7xl mx-auto space-y-8">
-        <div className="flex items-center justify-between">
-          <h1 className="text-4xl font-bold">World Clock</h1>
-          <Button onClick={handleAddTimeZone} className="gap-2">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <h1 className="text-4xl font-bold text-primary">World Clock</h1>
+          <Button 
+            onClick={handleAddTimeZone} 
+            className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white gap-2"
+          >
             <Plus className="h-4 w-4" />
             Add Time Zone
           </Button>
@@ -62,12 +79,15 @@ export const WorldClock = () => {
               .find(zone => zone.value === card.timezone);
 
             return (
-              <Card key={card.id} className="p-6 relative">
+              <Card 
+                key={card.id} 
+                className="p-6 relative bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow duration-300"
+              >
                 {timeZoneCards.length > 1 && (
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="absolute right-2 top-2 text-muted-foreground hover:text-destructive"
+                    className="absolute right-2 top-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                     onClick={() => handleRemoveTimeZone(card.id)}
                   >
                     <X className="h-4 w-4" />
@@ -76,13 +96,16 @@ export const WorldClock = () => {
 
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <label className="text-sm text-muted-foreground">Location</label>
+                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Location</label>
                     <Popover 
                       open={openPopovers[card.id]} 
                       onOpenChange={(open) => setOpenPopovers({ ...openPopovers, [card.id]: open })}
                     >
                       <PopoverTrigger asChild>
-                        <Button variant="outline" className="w-full justify-between">
+                        <Button 
+                          variant="outline" 
+                          className="w-full justify-between bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+                        >
                           {selectedZone ? (
                             <span className="flex items-center gap-2">
                               <span>{selectedZone.flag}</span>
@@ -94,7 +117,7 @@ export const WorldClock = () => {
                           <Globe className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-[400px] p-0" align="start">
+                      <PopoverContent className="w-[300px] p-0" align="start">
                         <Command>
                           <CommandInput placeholder="Search timezone..." />
                           <CommandList>
@@ -107,11 +130,10 @@ export const WorldClock = () => {
                                       key={zone.value}
                                       value={zone.label}
                                       onSelect={() => handleTimezoneChange(card.id, zone.value)}
+                                      className="flex items-center gap-2 cursor-pointer"
                                     >
-                                      <span className="flex items-center gap-2">
-                                        <span>{zone.flag}</span>
-                                        <span>{zone.label}</span>
-                                      </span>
+                                      <span>{zone.flag}</span>
+                                      <span>{zone.label}</span>
                                       <span
                                         className={cn(
                                           "ml-auto",
@@ -131,7 +153,7 @@ export const WorldClock = () => {
                     </Popover>
                   </div>
 
-                  <div className="flex justify-center items-center h-[200px]">
+                  <div className="flex justify-center items-center h-[120px] bg-gray-50 dark:bg-gray-900/50 rounded-lg">
                     <DigitalClock timezone={card.timezone} currentTime={currentTime} />
                   </div>
                 </div>
