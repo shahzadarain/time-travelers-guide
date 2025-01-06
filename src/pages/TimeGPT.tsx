@@ -32,7 +32,7 @@ const TimeGPT = () => {
     if (!apiKey) {
       toast({
         title: "API Key Required",
-        description: "Please enter your OpenAI API key to use this feature.",
+        description: "Please enter your Perplexity API key to use this feature.",
         variant: "destructive",
       });
       return;
@@ -51,15 +51,15 @@ const TimeGPT = () => {
     console.log("Starting time conversion for query:", query);
 
     try {
-      // Call OpenAI API to parse the query
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      // Call Perplexity API to parse the query
+      const response = await fetch("https://api.perplexity.ai/chat/completions", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "gpt-4o-mini",
+          model: "llama-3.1-sonar-small-128k-online",
           messages: [
             {
               role: "system",
@@ -83,7 +83,7 @@ const TimeGPT = () => {
       }
 
       const data = await response.json();
-      console.log("OpenAI API response:", data);
+      console.log("Perplexity API response:", data);
 
       const extractedInfo = JSON.parse(data.choices[0].message.content);
       console.log("Extracted info:", extractedInfo);
@@ -135,7 +135,7 @@ const TimeGPT = () => {
         <div className="space-y-4">
           <Input
             type="password"
-            placeholder="Enter your OpenAI API key"
+            placeholder="Enter your Perplexity API key"
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
             className="w-full"
