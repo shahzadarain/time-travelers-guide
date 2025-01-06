@@ -88,7 +88,7 @@ export const TimeZoneCard = ({
     .find(zone => zone.value === selectedTimezone);
 
   return (
-    <Card className="w-full animate-fade-in relative">
+    <Card className="w-full animate-fade-in relative time-zone-card">
       {!isSource && onRemove && (
         <Button
           variant="ghost"
@@ -101,7 +101,7 @@ export const TimeZoneCard = ({
         </Button>
       )}
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">
+        <CardTitle className="text-sm font-medium location-text">
           {isSource ? "Meeting Time Zone" : "Team Member Time Zone"}
         </CardTitle>
         <Globe className="h-4 w-4 text-muted-foreground" />
@@ -170,6 +170,7 @@ export const TimeZoneCard = ({
               isSource={isSource}
               time={getConvertedTime()}
               onTimeChange={handleTimeChange}
+              className="time-text"
             />
           </div>
         </div>
