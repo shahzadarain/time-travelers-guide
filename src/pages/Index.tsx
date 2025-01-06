@@ -5,174 +5,60 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Share2, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
 
 const Index = () => {
-  const [targetTimeZones, setTargetTimeZones] = useState([1]);
-  const [sourceTime, setSourceTime] = useState("");
-  const [sourceTimezone, setSourceTimezone] = useState("UTC");
   const { toast } = useToast();
+  const [timeZoneCards, setTimeZoneCards] = useState([{ id: 1, timezone: "UTC" }]);
 
   const handleAddTimeZone = () => {
-    if (targetTimeZones.length >= 4) {
-      toast({
-        title: "Maximum time zones reached",
-        description: "You can only add up to 4 team member time zones.",
-        variant: "destructive",
-      });
-      return;
-    }
-    setTargetTimeZones([...targetTimeZones, targetTimeZones.length + 1]);
+    const newId = Math.max(...timeZoneCards.map(card => card.id), 0) + 1;
+    setTimeZoneCards([...timeZoneCards, { id: newId, timezone: "UTC" }]);
+    toast({ title: "Time Zone Added", description: "You can now select a new time zone." });
   };
 
-  const handleRemoveTimeZone = (id: number) => {
-    setTargetTimeZones(targetTimeZones.filter(zoneId => zoneId !== id));
-  };
-
-  const handleSourceTimeZoneChange = (timezone: string) => {
-    console.log("Source time zone changed:", timezone);
-    setSourceTimezone(timezone);
-  };
-
-  const handleSourceTimeChange = (time: string) => {
-    console.log("Source time changed:", time);
-    setSourceTime(time);
-  };
-
-  const handleShare = async () => {
-    const meetingTime = sourceTime || new Date().toLocaleTimeString(undefined, {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    });
-
-    let shareText = `🌍 Meeting Time Zones Summary:\n\n`;
-    shareText += `📅 Meeting Time: ${meetingTime} (${sourceTimezone})\n\n`;
-    shareText += `Team Members' Local Times:\n`;
-    
-    // Get all timezone cards including source
-    const cards = document.querySelectorAll('.time-zone-card');
-    
-    cards.forEach((card, index) => {
-      // Get the location text (includes "Meeting Time Zone" or "Team Member Time Zone")
-      const locationElement = card.querySelector('.location-text');
-      // Get both the input time (for source) and display time (for team members)
-      const timeElement = card.querySelector('.time-text') || card.querySelector('input[type="time"]');
-      
-      if (locationElement && timeElement) {
-        const location = locationElement.textContent?.trim();
-        // Handle both input and display time elements
-        const time = timeElement instanceof HTMLInputElement ? timeElement.value : timeElement.textContent?.trim();
-        
-        console.log('Processing card:', { index, location, time }); // Debug log
-        
-        if (location && time) {
-          // Format the location to be more readable
-          const formattedLocation = location === "Meeting Time Zone" ? "Source" : `Team Member ${index}`;
-          // Get the selected timezone from the button text
-          const timezoneButton = card.querySelector('[role="combobox"]');
-          const timezone = timezoneButton?.textContent?.trim() || '';
-          
-          shareText += `${formattedLocation} (${timezone}): ${time}\n`;
-        }
-      }
-    });
-
-    console.log('Final share text:', shareText); // Debug log
-
-    try {
-      await navigator.clipboard.writeText(shareText);
-      toast({
-        title: "Copied to clipboard!",
-        description: "Time zones summary has been copied to your clipboard.",
-      });
-    } catch (err) {
-      console.error('Failed to copy:', err);
-      toast({
-        title: "Failed to copy",
-        description: "Please try again or copy manually.",
-        variant: "destructive",
-      });
+  const handleRemoveTimeZone = (id) => {
+    if (timeZoneCards.length > 1) {
+      setTimeZoneCards(timeZoneCards.filter(card => card.id !== id));
+      toast({ title: "Time Zone Removed", description: "You have removed a time zone." });
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <nav className="mb-8">
-          <NavigationMenu>
-            <NavigationMenuList>
-              <NavigationMenuItem>
-                <NavigationMenuTrigger>Navigation</NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <div className="p-4 w-[200px] space-y-2">
-                    <Link 
-                      to="/" 
-                      className="block px-4 py-2 hover:bg-gray-100 rounded-md"
-                    >
-                      Meeting Planner
-                    </Link>
-                    <Link 
-                      to="/world-clock" 
-                      className="block px-4 py-2 hover:bg-gray-100 rounded-md"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4" />
-                        World Clock
-                      </div>
-                    </Link>
-                  </div>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
+        <nav className="mb-8 flex justify-between items-center">
+          <h1 className="text-2xl font-bold">Time Zone Tools</h1>
+          <div className="flex gap-4">
+            <Link 
+              to="/" 
+              className="px-4 py-2 rounded-md hover:bg-gray-100 font-medium"
+            >
+              Meeting Planner
+            </Link>
+            <Link 
+              to="/world-clock" 
+              className="px-4 py-2 rounded-md hover:bg-gray-100 font-medium flex items-center gap-2"
+            >
+              <Clock className="h-4 w-4" />
+              World Clock
+            </Link>
+          </div>
         </nav>
 
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Remote Team Meeting Planner</h1>
-          <p className="text-lg text-gray-600 mb-2">
-            Plan meetings across different time zones with ease
-          </p>
-          <p className="text-sm text-gray-500 mb-4">
-            Set your meeting time and see what time it will be for your team members around the world
-          </p>
-          <Button 
-            onClick={handleShare}
-            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
-          >
-            <Share2 className="h-4 w-4" />
-            Share Time Zones
-          </Button>
+          <AddTimeZoneButton onClick={handleAddTimeZone} />
         </div>
 
-        <div className="grid gap-6 mb-8">
-          <TimeZoneCard 
-            isSource 
-            onTimeZoneChange={handleSourceTimeZoneChange}
-            onTimeChange={handleSourceTimeChange}
-          />
-        </div>
-
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">Team Members' Time Zones</h2>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {targetTimeZones.map((id) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {timeZoneCards.map((card) => (
             <TimeZoneCard 
-              key={id}
-              sourceTime={sourceTime}
-              sourceTimezone={sourceTimezone}
-              onRemove={() => handleRemoveTimeZone(id)}
+              key={card.id} 
+              id={card.id} 
+              timezone={card.timezone} 
+              onRemove={() => handleRemoveTimeZone(card.id)} 
             />
           ))}
-          {targetTimeZones.length < 4 && (
-            <AddTimeZoneButton onClick={handleAddTimeZone} />
-          )}
         </div>
       </div>
     </div>
