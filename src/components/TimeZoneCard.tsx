@@ -153,32 +153,34 @@ export const TimeZoneCard = ({ isSource = false, onTimeZoneChange }: TimeZoneCar
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[400px] p-0">
+            <PopoverContent className="w-[400px] p-0" align="start">
               <Command>
                 <CommandInput placeholder="Search time zone..." />
                 <CommandEmpty>No time zone found.</CommandEmpty>
-                {timeZones.map((continent) => (
-                  <CommandGroup key={continent.continent} heading={continent.continent}>
-                    {continent.zones.map((zone) => (
-                      <CommandItem
-                        key={zone.value}
-                        value={zone.value}
-                        onSelect={handleTimezoneChange}
-                      >
-                        <span className="flex items-center gap-2">
-                          <span>{zone.flag}</span>
-                          <span>{zone.label}</span>
-                        </span>
-                        <Check
-                          className={cn(
-                            "ml-auto h-4 w-4",
-                            selectedTimezone === zone.value ? "opacity-100" : "opacity-0"
-                          )}
-                        />
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                ))}
+                <div className="max-h-[300px] overflow-y-auto">
+                  {timeZones.map((continent) => (
+                    <CommandGroup key={continent.continent} heading={continent.continent}>
+                      {continent.zones.map((zone) => (
+                        <CommandItem
+                          key={zone.value}
+                          value={zone.value}
+                          onSelect={handleTimezoneChange}
+                        >
+                          <span className="flex items-center gap-2">
+                            <span>{zone.flag}</span>
+                            <span>{zone.label}</span>
+                          </span>
+                          <Check
+                            className={cn(
+                              "ml-auto h-4 w-4",
+                              selectedTimezone === zone.value ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  ))}
+                </div>
               </Command>
             </PopoverContent>
           </Popover>
