@@ -21,6 +21,10 @@ const Index = () => {
     setTargetTimeZones([...targetTimeZones, targetTimeZones.length + 1]);
   };
 
+  const handleRemoveTimeZone = (id: number) => {
+    setTargetTimeZones(targetTimeZones.filter(zoneId => zoneId !== id));
+  };
+
   const handleSourceTimeZoneChange = (timezone: string) => {
     console.log("Source time zone changed:", timezone);
     setSourceTimezone(timezone);
@@ -59,6 +63,7 @@ const Index = () => {
               key={id}
               sourceTime={sourceTime}
               sourceTimezone={sourceTimezone}
+              onRemove={() => handleRemoveTimeZone(id)}
             />
           ))}
           {targetTimeZones.length < 4 && (

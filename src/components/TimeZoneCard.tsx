@@ -2,16 +2,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Check, ChevronsUpDown, Clock, Globe } from "lucide-react";
+import { Check, ChevronsUpDown, Globe, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { timeZones } from "@/data/timeZones";
+import { CurrentTimeDisplay } from "./CurrentTimeDisplay";
+import { MeetingTimeDisplay } from "./MeetingTimeDisplay";
 
 interface TimeZoneCardProps {
   isSource?: boolean;
   onTimeZoneChange?: (timezone: string) => void;
   onTimeChange?: (time: string) => void;
+  onRemove?: () => void;
   sourceTime?: string;
   sourceTimezone?: string;
 }
@@ -20,6 +22,7 @@ export const TimeZoneCard = ({
   isSource = false, 
   onTimeZoneChange, 
   onTimeChange,
+  onRemove,
   sourceTime,
   sourceTimezone 
 }: TimeZoneCardProps) => {
@@ -48,9 +51,9 @@ export const TimeZoneCard = ({
     onTimeZoneChange?.(value);
   };
 
-  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedTime(e.target.value);
-    onTimeChange?.(e.target.value);
+  const handleTimeChange = (time: string) => {
+    setSelectedTime(time);
+    onTimeChange?.(time);
   };
 
   const getConvertedTime = () => {
@@ -85,7 +88,18 @@ export const TimeZoneCard = ({
     .find(zone => zone.value === selectedTimezone);
 
   return (
-    <Card className="w-full animate-fade-in">
+    <Card className="w-full animate-fade-in relative">
+      {!isSource && onRemove && (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute right-2 top-2 text-muted-foreground hover:text-destructive"
+          onClick={onRemove}
+          aria-label="Remove time zone"
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      )}
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">
           {isSource ? "Meeting Time Zone" : "Team Member Time Zone"}
@@ -151,50 +165,12 @@ export const TimeZoneCard = ({
           </div>
           
           <div className="space-y-4">
-            {/* Current Local Time Display */}
-            <div className="flex flex-col space-y-2 p-4 rounded-md bg-secondary/50">
-              <span className="text-sm font-medium text-muted-foreground">Current Local Time</span>
-              <div className="flex items-center space-x-2">
-                <Clock className="h-4 w-4 text-muted-foreground" />
-                <span className="text-lg font-semibold text-primary">
-                  {getCurrentTime()}
-                </span>
-              </div>
-            </div>
-
-            {/* Meeting Time Section */}
-            <div className="flex flex-col space-y-2 p-4 rounded-md bg-primary/10">
-              {isSource ? (
-                <>
-                  <span className="text-sm font-medium text-muted-foreground">Set Meeting Time</span>
-                  <div className="flex items-center space-x-2">
-                    <Clock className="h-4 w-4 text-primary" />
-                    <Input
-                      type="time"
-                      value={selectedTime}
-                      onChange={handleTimeChange}
-                      className="w-32"
-                    />
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Select the time when you want to schedule the meeting
-                  </p>
-                </>
-              ) : (
-                <>
-                  <span className="text-sm font-medium text-muted-foreground">Equivalent Meeting Time</span>
-                  <div className="flex items-center space-x-2">
-                    <Clock className="h-4 w-4 text-primary" />
-                    <span className="text-2xl font-bold text-primary">
-                      {getConvertedTime()}
-                    </span>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    This is when the meeting will happen in this time zone
-                  </p>
-                </>
-              )}
-            </div>
+            <CurrentTimeDisplay time={getCurrentTime()} />
+            <MeetingTimeDisplay 
+              isSource={isSource}
+              time={getConvertedTime()}
+              onTimeChange={handleTimeChange}
+            />
           </div>
         </div>
       </CardContent>
