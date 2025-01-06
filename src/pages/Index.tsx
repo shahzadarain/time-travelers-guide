@@ -13,7 +13,7 @@ const Index = () => {
     if (targetTimeZones.length >= 4) {
       toast({
         title: "Maximum time zones reached",
-        description: "You can only add up to 4 target time zones.",
+        description: "You can only add up to 4 team member time zones.",
         variant: "destructive",
       });
       return;
@@ -35,9 +35,12 @@ const Index = () => {
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Time Zone Navigator</h1>
-          <p className="text-lg text-gray-600">
-            Convert times across different time zones easily
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">Remote Team Meeting Planner</h1>
+          <p className="text-lg text-gray-600 mb-2">
+            Plan meetings across different time zones with ease
+          </p>
+          <p className="text-sm text-gray-500">
+            Set your meeting time and see what time it will be for your team members around the world
           </p>
         </div>
 
@@ -49,6 +52,7 @@ const Index = () => {
           />
         </div>
 
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">Team Members' Time Zones</h2>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {targetTimeZones.map((id) => (
             <TimeZoneCard 

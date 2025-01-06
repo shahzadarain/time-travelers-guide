@@ -88,94 +88,110 @@ export const TimeZoneCard = ({
     <Card className="w-full animate-fade-in">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">
-          {isSource ? "Source Time Zone" : "Target Time Zone"}
+          {isSource ? "Meeting Time Zone" : "Team Member Time Zone"}
         </CardTitle>
         <Globe className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                aria-expanded={open}
-                className="w-full justify-between"
-              >
-                {selectedZone ? (
-                  <span className="flex items-center gap-2">
-                    <span>{selectedZone.flag}</span>
-                    <span className="truncate">{selectedZone.label}</span>
-                  </span>
-                ) : (
-                  "Select time zone..."
-                )}
-                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[400px] p-0" align="start">
-              <Command>
-                <CommandInput placeholder="Search by country or city..." />
-                <CommandList>
-                  <CommandEmpty>No time zone found.</CommandEmpty>
-                  <div className="max-h-[300px] overflow-y-auto">
-                    {timeZones.map((continent) => (
-                      <CommandGroup key={continent.continent} heading={continent.continent}>
-                        {continent.zones.map((zone) => (
-                          <CommandItem
-                            key={zone.value}
-                            value={zone.label}
-                            onSelect={() => handleTimezoneChange(zone.value)}
-                          >
-                            <span className="flex items-center gap-2">
-                              <span>{zone.flag}</span>
-                              <span>{zone.label}</span>
-                            </span>
-                            <Check
-                              className={cn(
-                                "ml-auto h-4 w-4",
-                                selectedTimezone === zone.value ? "opacity-100" : "opacity-0"
-                              )}
-                            />
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    ))}
-                  </div>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
+          <div className="space-y-2">
+            <label className="text-sm text-muted-foreground">Select Location</label>
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={open}
+                  className="w-full justify-between"
+                >
+                  {selectedZone ? (
+                    <span className="flex items-center gap-2">
+                      <span>{selectedZone.flag}</span>
+                      <span className="truncate">{selectedZone.label}</span>
+                    </span>
+                  ) : (
+                    "Select time zone..."
+                  )}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[400px] p-0" align="start">
+                <Command>
+                  <CommandInput placeholder="Search by country or city..." />
+                  <CommandList>
+                    <CommandEmpty>No time zone found.</CommandEmpty>
+                    <div className="max-h-[300px] overflow-y-auto">
+                      {timeZones.map((continent) => (
+                        <CommandGroup key={continent.continent} heading={continent.continent}>
+                          {continent.zones.map((zone) => (
+                            <CommandItem
+                              key={zone.value}
+                              value={zone.label}
+                              onSelect={() => handleTimezoneChange(zone.value)}
+                            >
+                              <span className="flex items-center gap-2">
+                                <span>{zone.flag}</span>
+                                <span>{zone.label}</span>
+                              </span>
+                              <Check
+                                className={cn(
+                                  "ml-auto h-4 w-4",
+                                  selectedTimezone === zone.value ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      ))}
+                    </div>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          </div>
           
           <div className="space-y-4">
-            {/* Current Time Display */}
-            <div className="flex items-center space-x-2 p-3 rounded-md bg-secondary/50">
-              <Clock className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium text-muted-foreground">Current:</span>
-              <span className="text-lg font-semibold text-primary">
-                {getCurrentTime()}
-              </span>
+            {/* Current Local Time Display */}
+            <div className="flex flex-col space-y-2 p-4 rounded-md bg-secondary/50">
+              <span className="text-sm font-medium text-muted-foreground">Current Local Time</span>
+              <div className="flex items-center space-x-2">
+                <Clock className="h-4 w-4 text-muted-foreground" />
+                <span className="text-lg font-semibold text-primary">
+                  {getCurrentTime()}
+                </span>
+              </div>
             </div>
 
-            {/* Selected/Converted Time Display */}
-            <div className="flex items-center space-x-2 p-3 rounded-md bg-primary/10">
-              <Clock className="h-4 w-4 text-primary" />
+            {/* Meeting Time Section */}
+            <div className="flex flex-col space-y-2 p-4 rounded-md bg-primary/10">
               {isSource ? (
                 <>
-                  <span className="text-sm font-medium text-muted-foreground">Selected:</span>
-                  <Input
-                    type="time"
-                    value={selectedTime}
-                    onChange={handleTimeChange}
-                    className="w-32"
-                  />
+                  <span className="text-sm font-medium text-muted-foreground">Set Meeting Time</span>
+                  <div className="flex items-center space-x-2">
+                    <Clock className="h-4 w-4 text-primary" />
+                    <Input
+                      type="time"
+                      value={selectedTime}
+                      onChange={handleTimeChange}
+                      className="w-32"
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Select the time when you want to schedule the meeting
+                  </p>
                 </>
               ) : (
                 <>
-                  <span className="text-sm font-medium text-muted-foreground">Converted:</span>
-                  <span className="text-2xl font-bold text-primary">
-                    {getConvertedTime()}
-                  </span>
+                  <span className="text-sm font-medium text-muted-foreground">Equivalent Meeting Time</span>
+                  <div className="flex items-center space-x-2">
+                    <Clock className="h-4 w-4 text-primary" />
+                    <span className="text-2xl font-bold text-primary">
+                      {getConvertedTime()}
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    This is when the meeting will happen in this time zone
+                  </p>
                 </>
               )}
             </div>
