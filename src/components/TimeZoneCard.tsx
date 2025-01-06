@@ -65,8 +65,8 @@ export const TimeZoneCard = ({ isSource = false, onTimeZoneChange }: TimeZoneCar
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-[400px] p-0" align="start">
-              <Command>
-                <CommandInput placeholder="Search time zone..." />
+              <Command shouldFilter={false}>
+                <CommandInput placeholder="Search by country or city..." />
                 <CommandList>
                   <CommandEmpty>No time zone found.</CommandEmpty>
                   <div className="max-h-[300px] overflow-y-auto">
@@ -75,8 +75,8 @@ export const TimeZoneCard = ({ isSource = false, onTimeZoneChange }: TimeZoneCar
                         {continent.zones.map((zone) => (
                           <CommandItem
                             key={zone.value}
-                            value={zone.value}
-                            onSelect={handleTimezoneChange}
+                            value={`${zone.label} ${zone.value}`}
+                            onSelect={() => handleTimezoneChange(zone.value)}
                           >
                             <span className="flex items-center gap-2">
                               <span>{zone.flag}</span>
