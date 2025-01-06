@@ -3,7 +3,16 @@ import { TimeZoneCard } from "@/components/TimeZoneCard";
 import { AddTimeZoneButton } from "@/components/AddTimeZoneButton";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Share2 } from "lucide-react";
+import { Share2, Clock } from "lucide-react";
+import { Link } from "react-router-dom";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
 
 const Index = () => {
   const [targetTimeZones, setTargetTimeZones] = useState([1]);
@@ -97,6 +106,35 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
+        <nav className="mb-8">
+          <NavigationMenu>
+            <NavigationMenuList>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger>Navigation</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <div className="p-4 w-[200px] space-y-2">
+                    <Link 
+                      to="/" 
+                      className="block px-4 py-2 hover:bg-gray-100 rounded-md"
+                    >
+                      Meeting Planner
+                    </Link>
+                    <Link 
+                      to="/world-clock" 
+                      className="block px-4 py-2 hover:bg-gray-100 rounded-md"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4" />
+                        World Clock
+                      </div>
+                    </Link>
+                  </div>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
+        </nav>
+
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Remote Team Meeting Planner</h1>
           <p className="text-lg text-gray-600 mb-2">
