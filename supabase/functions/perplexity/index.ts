@@ -14,17 +14,20 @@ serve(async (req) => {
 
   try {
     const OLLAMA_API_URL = Deno.env.get('OLLAMA_API_URL');
-    console.log('Using OLLAMA_API_URL:', OLLAMA_API_URL); // Added for debugging
+    console.log('Using OLLAMA_API_URL:', OLLAMA_API_URL);
     
     if (!OLLAMA_API_URL) {
-      console.error('OLLAMA_API_URL is not set');
       throw new Error('OLLAMA_API_URL is not set');
     }
 
     const { query } = await req.json();
     console.log("Processing query:", query);
 
-    const response = await fetch(`${OLLAMA_API_URL}/api/generate`, {
+    // Construct the full URL and log it for debugging
+    const apiUrl = `${OLLAMA_API_URL}/api/generate`;
+    console.log("Making request to:", apiUrl);
+
+    const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -36,18 +39,22 @@ serve(async (req) => {
       }),
     });
 
+    // Log the response status and status text
+    console.log("Ollama API response status:", response.status, response.statusText);
+
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Ollama API Error:", {
+      console.error("Ollama API Error Response:", {
         status: response.status,
         statusText: response.statusText,
-        body: errorText
+        body: errorText,
+        url: apiUrl
       });
       throw new Error(`Ollama API request failed: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
-    console.log("Ollama API Response:", data);
+    console.log("Ollama API Response data:", data);
 
     // Format the response to match the expected structure
     const formattedResponse = {
@@ -62,7 +69,12 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      cause: error.cause
+    });
+
     // Return a proper error response with CORS headers
     return new Response(
       JSON.stringify({ 
