@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const OLLAMA_API_URL = "https://baf0d22de77b.ngrok.app/api/generate";
+const OLLAMA_API_URL = "https://baf0d22de77b.ngrok.app/api";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -16,17 +16,33 @@ serve(async (req) => {
   }
 
   try {
+    // First, let's check what models are available
+    const modelsResponse = await fetch(`${OLLAMA_API_URL}/tags`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!modelsResponse.ok) {
+      console.error("Failed to fetch models:", await modelsResponse.text());
+      throw new Error("Failed to fetch available models");
+    }
+
+    const models = await modelsResponse.json();
+    console.log("Available models:", models);
+
     const { query } = await req.json();
     console.log("Received query:", query);
 
     // Make request to Ollama API
-    const response = await fetch(OLLAMA_API_URL, {
+    const response = await fetch(`${OLLAMA_API_URL}/generate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'llama2',  // Using llama2 as llama3.2 is not available
+        model: 'llama2:latest',  // Using latest tag which is commonly available
         prompt: query,
       }),
     });
