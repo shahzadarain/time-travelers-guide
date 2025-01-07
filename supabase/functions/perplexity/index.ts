@@ -14,6 +14,8 @@ serve(async (req) => {
 
   try {
     const OLLAMA_API_URL = Deno.env.get('OLLAMA_API_URL');
+    console.log('Using OLLAMA_API_URL:', OLLAMA_API_URL); // Added for debugging
+    
     if (!OLLAMA_API_URL) {
       console.error('OLLAMA_API_URL is not set');
       throw new Error('OLLAMA_API_URL is not set');
