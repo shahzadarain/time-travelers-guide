@@ -26,7 +26,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'llama2',  // Changed from llama3.2 to llama2
+        model: 'mistral',  // Changed to mistral which is commonly available
         prompt: query,
       }),
     });
@@ -40,11 +40,10 @@ serve(async (req) => {
     const data = await response.json();
     console.log("API Response:", data);
 
-    // Format the response to match the expected AIResponse type
     return new Response(JSON.stringify({ response: data.response }), {
       headers: {
+        ...corsHeaders,
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
       },
     });
 
@@ -53,8 +52,8 @@ serve(async (req) => {
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: {
+        ...corsHeaders,
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
       },
     });
   }

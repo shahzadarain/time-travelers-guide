@@ -14,10 +14,7 @@ export const makePerplexityRequest = async (query: string) => {
 
     // Make the request to our Edge Function
     const { data, error } = await supabase.functions.invoke('ollama', {
-      body: { 
-        query: `You are a time conversion assistant. Extract time and location information from this query and respond with ONLY a JSON object in this EXACT format, with NO additional text: {"sourceLocation":"LOCATION","sourceTime":"HH:mm","targetLocation":"LOCATION"}. Use only city or country names without extra words. Query: ${query}` 
-      },
-      // Pass the session token if we have one
+      body: { query },
       headers: session ? {
         Authorization: `Bearer ${session.access_token}`
       } : {}
@@ -34,10 +31,9 @@ export const makePerplexityRequest = async (query: string) => {
     }
 
     console.log("API Response:", data);
-    return data; // Return the data directly since it's already in the correct format
+    return data;
   } catch (error) {
     console.error("Error in makePerplexityRequest:", error);
-    // Rethrow the error with more context
-    throw new Error(`Failed to process time conversion: ${error.message}`);
+    throw new Error(`Failed to process request: ${error.message}`);
   }
 };

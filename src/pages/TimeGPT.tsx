@@ -52,7 +52,7 @@ const TimeGPT = () => {
         <div className="max-w-2xl mx-auto space-y-8">
           <div className="space-y-2 animate-fade-in">
             <h1 className="text-4xl font-bold text-white">TimeGPT</h1>
-            <p className="text-[#aaadb0]">Powered by Llama 2</p>
+            <p className="text-[#aaadb0]">Powered by Mistral</p>
           </div>
           
           <div className="space-y-6 bg-black/20 p-6 rounded-lg backdrop-blur-sm border border-white/10 animate-fade-in">
