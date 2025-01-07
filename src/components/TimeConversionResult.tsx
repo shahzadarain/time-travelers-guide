@@ -1,9 +1,6 @@
 interface TimeConversionResultProps {
   result: {
-    sourceLocation: string;
-    sourceTime: string;
-    targetLocation: string;
-    convertedTime: string;
+    response: string;
   } | null;
 }
 
@@ -11,10 +8,9 @@ export const TimeConversionResult = ({ result }: TimeConversionResultProps) => {
   if (!result) return null;
 
   return (
-    <div className="bg-secondary p-4 rounded-lg">
-      <p className="text-lg">
-        {result.sourceTime} in {result.sourceLocation} is{" "}
-        {result.convertedTime} in {result.targetLocation}
+    <div className="bg-black/30 p-6 rounded-lg border border-white/10">
+      <p className="text-lg text-white font-light leading-relaxed">
+        {result.response}
       </p>
     </div>
   );
