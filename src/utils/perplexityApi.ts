@@ -26,16 +26,16 @@ export const makePerplexityRequest = async (query: string) => {
       throw error;
     }
 
-    console.log("API Response:", data);
-    
-    if (!data.choices?.[0]?.message?.content) {
+    if (!data || !data.choices?.[0]?.message?.content) {
       console.error("Invalid API response format:", data);
       throw new Error("Invalid response format from API");
     }
 
+    console.log("API Response:", data);
     return data;
   } catch (error) {
     console.error("Error in makePerplexityRequest:", error);
-    throw error;
+    // Rethrow the error with more context
+    throw new Error(`Failed to process time conversion: ${error.message}`);
   }
 };

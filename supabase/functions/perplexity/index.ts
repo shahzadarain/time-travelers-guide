@@ -15,6 +15,7 @@ serve(async (req) => {
   try {
     const OLLAMA_API_URL = Deno.env.get('OLLAMA_API_URL');
     if (!OLLAMA_API_URL) {
+      console.error('OLLAMA_API_URL is not set');
       throw new Error('OLLAMA_API_URL is not set');
     }
 
@@ -60,10 +61,14 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error('Error:', error);
+    // Return a proper error response with CORS headers
     return new Response(
-      JSON.stringify({ error: error.message }), 
+      JSON.stringify({ 
+        error: error.message,
+        details: error.stack 
+      }), 
       { 
-        status: error.message === 'Unauthorized' ? 401 : 500,
+        status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
