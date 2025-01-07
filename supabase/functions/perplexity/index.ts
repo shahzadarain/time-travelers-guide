@@ -14,20 +14,19 @@ serve(async (req) => {
 
   try {
     const OLLAMA_API_URL = Deno.env.get('OLLAMA_API_URL');
-    console.log('Using OLLAMA_API_URL:', OLLAMA_API_URL);
-    
+    console.log('OLLAMA_API_URL:', OLLAMA_API_URL);
+
     if (!OLLAMA_API_URL) {
-      throw new Error('OLLAMA_API_URL is not set');
+      throw new Error('OLLAMA_API_URL environment variable is not set');
     }
 
     const { query } = await req.json();
-    console.log("Processing query:", query);
+    console.log('Received query:', query);
 
-    // Construct the full URL and log it for debugging
-    const apiUrl = `${OLLAMA_API_URL}/api/generate`;
-    console.log("Making request to:", apiUrl);
+    const apiUrl = new URL('/api/generate', OLLAMA_API_URL).toString();
+    console.log('Making request to:', apiUrl);
 
-    const response = await fetch(apiUrl, {
+    const ollamaResponse = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -39,49 +38,46 @@ serve(async (req) => {
       }),
     });
 
-    // Log the response status and status text
-    console.log("Ollama API response status:", response.status, response.statusText);
+    console.log('Ollama response status:', ollamaResponse.status);
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Ollama API Error Response:", {
-        status: response.status,
-        statusText: response.statusText,
-        body: errorText,
-        url: apiUrl
+    if (!ollamaResponse.ok) {
+      const errorText = await ollamaResponse.text();
+      console.error('Ollama API error:', {
+        status: ollamaResponse.status,
+        text: errorText,
+        url: apiUrl,
       });
-      throw new Error(`Ollama API request failed: ${response.status} - ${errorText}`);
+      throw new Error(`Ollama API error: ${ollamaResponse.status} - ${errorText}`);
     }
 
-    const data = await response.json();
-    console.log("Ollama API Response data:", data);
+    const data = await ollamaResponse.json();
+    console.log('Ollama response data:', data);
 
-    // Format the response to match the expected structure
-    const formattedResponse = {
-      choices: [{
-        message: {
-          content: data.response
-        }
-      }]
-    };
+    return new Response(
+      JSON.stringify({
+        choices: [{
+          message: {
+            content: data.response
+          }
+        }]
+      }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
 
-    return new Response(JSON.stringify(formattedResponse), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
   } catch (error) {
-    console.error('Error details:', {
+    console.error('Error in edge function:', {
       message: error.message,
       stack: error.stack,
-      cause: error.cause
     });
 
-    // Return a proper error response with CORS headers
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         error: error.message,
-        details: error.stack 
-      }), 
-      { 
+        details: error.stack,
+      }),
+      {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
