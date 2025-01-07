@@ -28,19 +28,13 @@ export const makePerplexityRequest = async (query: string) => {
       throw error;
     }
 
-    if (!data || !data.response) {
+    if (!data) {
       console.error("Invalid API response format:", data);
       throw new Error("Invalid response format from API");
     }
 
     console.log("API Response:", data);
-    return {
-      choices: [{
-        message: {
-          content: data.response
-        }
-      }]
-    };
+    return data; // Return the data directly since it's already in the correct format
   } catch (error) {
     console.error("Error in makePerplexityRequest:", error);
     // Rethrow the error with more context
