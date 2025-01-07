@@ -6,7 +6,6 @@ import { TimeConversionResult } from "@/components/TimeConversionResult";
 import { makePerplexityRequest } from "@/utils/perplexityApi";
 import { findTimeZone, convertTime, createTimeFromString } from "@/services/timezoneService";
 import { format } from "date-fns";
-import { supabase } from "@/integrations/supabase/client";
 
 interface TimeConversion {
   sourceLocation: string;
@@ -93,19 +92,21 @@ const TimeGPT = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="min-h-screen bg-background">
       <MainNav />
-      <div className="max-w-2xl mx-auto mt-8 space-y-6">
-        <h1 className="text-3xl font-bold">TimeGPT</h1>
-        
-        <TimeConversionForm
-          query={query}
-          isLoading={isLoading}
-          onQueryChange={setQuery}
-          onSubmit={handleConversion}
-        />
+      <div className="container mx-auto px-4">
+        <div className="max-w-2xl mx-auto mt-8 space-y-6">
+          <h1 className="text-3xl font-bold text-primary">TimeGPT</h1>
+          
+          <TimeConversionForm
+            query={query}
+            isLoading={isLoading}
+            onQueryChange={setQuery}
+            onSubmit={handleConversion}
+          />
 
-        <TimeConversionResult result={result} />
+          <TimeConversionResult result={result} />
+        </div>
       </div>
     </div>
   );

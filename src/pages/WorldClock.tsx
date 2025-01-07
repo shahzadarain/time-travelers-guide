@@ -88,10 +88,9 @@ export const WorldClock = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
-      <div className="max-w-7xl mx-auto">
-        <MainNav />
-        
+    <div className="min-h-screen bg-background">
+      <MainNav />
+      <div className="container mx-auto px-4">
         <div className="space-y-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <h1 className="text-4xl font-bold text-primary">World Clock</h1>
