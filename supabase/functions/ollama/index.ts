@@ -26,7 +26,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'mistral',  // Changed to mistral which is commonly available
+        model: 'llama2',  // Using llama2 as llama3.2 is not available
         prompt: query,
       }),
     });
