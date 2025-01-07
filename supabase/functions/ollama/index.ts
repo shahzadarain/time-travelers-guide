@@ -32,7 +32,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'llama2',
+        model: 'mistral',  // Changed from llama2 to mistral
         prompt: query,
       }),
     });
