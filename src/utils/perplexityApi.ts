@@ -14,7 +14,9 @@ export const makePerplexityRequest = async (query: string) => {
 
     // Make the request to our Edge Function
     const { data, error } = await supabase.functions.invoke('ollama', {
-      body: { query },
+      body: { 
+        query: `You are a time conversion assistant. Extract time and location information from this query and respond with ONLY a JSON object in this EXACT format, with NO additional text: {"sourceLocation":"LOCATION","sourceTime":"HH:mm","targetLocation":"LOCATION"}. Use only city or country names without extra words. Query: ${query}` 
+      },
       // Pass the session token if we have one
       headers: session ? {
         Authorization: `Bearer ${session.access_token}`
@@ -26,13 +28,19 @@ export const makePerplexityRequest = async (query: string) => {
       throw error;
     }
 
-    if (!data || !data.choices?.[0]?.message?.content) {
+    if (!data || !data.response) {
       console.error("Invalid API response format:", data);
       throw new Error("Invalid response format from API");
     }
 
     console.log("API Response:", data);
-    return data;
+    return {
+      choices: [{
+        message: {
+          content: data.response
+        }
+      }]
+    };
   } catch (error) {
     console.error("Error in makePerplexityRequest:", error);
     // Rethrow the error with more context

@@ -33,8 +33,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: 'llama2',
-        prompt: `You are a time conversion assistant. Extract time and location information from this query and respond with ONLY a JSON object in this EXACT format, with NO additional text: {"sourceLocation":"LOCATION","sourceTime":"HH:mm","targetLocation":"LOCATION"}. Use only city or country names without extra words. Query: ${query}`,
-        stream: false,
+        prompt: query,
       }),
     });
 
@@ -53,14 +52,9 @@ serve(async (req) => {
     const data = await ollamaResponse.json();
     console.log('Ollama response data:', data);
 
+    // Return the raw Ollama response
     return new Response(
-      JSON.stringify({
-        choices: [{
-          message: {
-            content: data.response
-          }
-        }]
-      }),
+      JSON.stringify(data),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
