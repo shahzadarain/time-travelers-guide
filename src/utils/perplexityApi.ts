@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export const makePerplexityRequest = async (query: string) => {
-  console.log("Making Perplexity API request for query:", query);
+  console.log("Making Ollama API request for query:", query);
   
   try {
     // Get the current session
@@ -13,7 +13,7 @@ export const makePerplexityRequest = async (query: string) => {
     }
 
     // Make the request to our Edge Function
-    const { data, error } = await supabase.functions.invoke('perplexity', {
+    const { data, error } = await supabase.functions.invoke('ollama', {
       body: { query },
       // Pass the session token if we have one
       headers: session ? {
